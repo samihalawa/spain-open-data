@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "checked_at": "2026-10-20T16:34:06.213231+00:00",
+  "checks": [
+    {
+      "command": "python3 scripts/check_package.py",
+      "exit_code": 0,
+      "output": "PASS: package structure, identity, policies, icon, scoped CLI and five error/input guards: spain-open-data\n"
+    },
+    {
+      "command": "claude plugin validate --strict .claude-plugin/plugin.json",
+      "exit_code": 0,
+      "output": "Validating plugin manifest: [user-home]/repos/spain-standalone-public/spain-open-data/.claude-plugin/plugin.json\n\n✔ Validation passed\n"
+    },
+    {
+      "command": "claude plugin validate --strict .",
+      "exit_code": 0,
+      "output": "Validating marketplace manifest: [user-home]/repos/spain-standalone-public/spain-open-data/.claude-plugin/marketplace.json\n\n✔ Validation passed\n"
+    }
+  ]
+}

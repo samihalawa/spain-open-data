@@ -6,6 +6,10 @@ Repository: https://github.com/samihalawa/spain-open-data
 
 Plugin at repository root. Stable identity: `spain-open-data`.
 
+Public product page: https://samihalawa.github.io/spain-open-data/
+
+Saved official-source report: https://samihalawa.github.io/spain-open-data/demo.html
+
 ## Listing
 
 Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.

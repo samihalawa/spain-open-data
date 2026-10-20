@@ -22,9 +22,11 @@ Encuentra datasets españoles y compara publicador, formatos, licencia y fecha a
 
 También: “Encuentra datos de mi municipio y distingue catálogo, descarga e inspección real.”
 
-[Ver el informe de ejemplo](examples/demo.md) · [Código de la página del producto](docs/index.html) · [Flujo completo](skills/spain-open-data/references/workflow.md)
+[Ver el informe de ejemplo](https://samihalawa.github.io/spain-open-data/demo.html) · [Web y demostración](https://samihalawa.github.io/spain-open-data/) · [Flujo completo](skills/spain-open-data/references/workflow.md)
 
 La demostración es una **captura guardada de fuentes oficiales**, no una consulta actual. Conserva fecha, enlaces y alcance.
+
+[![Vista de Spain Open Data](docs/preview.jpg)](https://samihalawa.github.io/spain-open-data/)
 
 ## Instalar en Claude Code
 

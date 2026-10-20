@@ -18,7 +18,7 @@
     "logo": "./assets/icon.png",
     "longDescription": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.\n\nDesarrolladores y equipos que buscan datos públicos reutilizables. Identificador del dataset reutilizable en la siguiente consulta. Publicador, formatos y licencia en una ficha comparable. Metadatos encontrados separados de un fichero realmente inspeccionado.\n\nEjemplos guardados sin conexión e informes HTML/Markdown/JSON. Sin cuenta adicional, claves API ni servicio propio. Los scripts requieren Python 3.11+ y red autorizada. En ChatGPT, se utilizan únicamente las herramientas nativas disponibles.\n\nNo descarga automáticamente distribuciones externas ni ejecuta archivos. No garantiza licencias o descargas vigentes. La fecha del catálogo no equivale al periodo del dato.",
     "shortDescription": "Datasets listos para evaluar",
-    "websiteURL": "https://github.com/samihalawa/spain-open-data/blob/main/README.md",
+    "websiteURL": "https://samihalawa.github.io/spain-open-data/",
     "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
     "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
     "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
@@ -35,5 +35,6 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.2.0"
+  "version": "0.2.0",
+  "homepage": "https://samihalawa.github.io/spain-open-data/"
 }

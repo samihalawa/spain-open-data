@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "checked_at": "2026-10-20T16:34:05.059035+00:00",
+  "source_commit": "25182f145f5ddc815d6bde7e6829e31fa5fb86b8",
+  "public_url": "https://samihalawa.github.io/spain-open-data/",
+  "source": {
+    "branch": "main",
+    "path": "/docs"
+  },
+  "scope": "Anonymous HTTP and exact published-asset matching; responsive behavior tested separately.",
+  "checks": [
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/",
+      "http_status": 200,
+      "sha256": "6d234527328778a65a542e8777bd753125d6bc723de296c611a7edaafbc27409",
+      "matches_source": true
+    },
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/demo.html",
+      "http_status": 200,
+      "sha256": "3334f5e9785b979952cf621d619d63c3bb846789141f31d8282da292908ed075",
+      "matches_source": true
+    },
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/style.css",
+      "http_status": 200,
+      "sha256": "add71020320976e5631374baacaef51844820112f139eb17f59f846f25d7b8c6",
+      "matches_source": true
+    },
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/site.js",
+      "http_status": 200,
+      "sha256": "59108e7d8efc8395bf2f34105b557e7468dfc1998902b92dd57bb20ed0ff8340",
+      "matches_source": true
+    },
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/icon.png",
+      "http_status": 200,
+      "sha256": "d9d140affebca9142f8702f7a33b3a28097d34ca8069f28a6f5aa795085a0111",
+      "matches_source": true
+    },
+    {
+      "url": "https://samihalawa.github.io/spain-open-data/preview.jpg",
+      "http_status": 200,
+      "sha256": "3b0958264913813f9a73988f80e3dd0e1d16924f4a6eb5ef37c24f315b4efd03",
+      "matches_source": true
+    }
+  ]
+}
