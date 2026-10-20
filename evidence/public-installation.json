@@ -1,0 +1,55 @@
+{
+  "name": "spain-open-data",
+  "checked_at": "2026-10-20T15:51:13.202049+00:00",
+  "source_commit": "3e4fe303180a582a0dca1bf1c703c1cc27ed3e6d",
+  "public_links": [
+    {
+      "field": "documentationUrl",
+      "url": "https://github.com/samihalawa/spain-open-data/blob/main/README.md",
+      "anonymous_http_status": 200,
+      "content_sha256": "b79c8c836733aab6af08f1a64ae9c93ceb30d85b8d8eebef54f23e27367d4c20"
+    },
+    {
+      "field": "supportUrl",
+      "url": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
+      "anonymous_http_status": 200,
+      "content_sha256": "16a1cca952758bfea20e5bc48ed6a3561c1e24fd819fb228c2e2e5778b00d6f1"
+    },
+    {
+      "field": "privacyPolicyUrl",
+      "url": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
+      "anonymous_http_status": 200,
+      "content_sha256": "4486b4c0063ca085f5c5e6f2bc5afb96d51b18fdc7925ed9b67c9c8fde990ac9"
+    },
+    {
+      "field": "termsOfServiceUrl",
+      "url": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md",
+      "anonymous_http_status": 200,
+      "content_sha256": "a6c2ed312ba54b63f363f3777d6e4b685abfc2c1c11e345d3f805ebf96853d4c"
+    }
+  ],
+  "installation": [
+    {
+      "command": "claude plugin marketplace add https://github.com/samihalawa/spain-open-data.git",
+      "exit_code": 0,
+      "output": "Adding marketplace…Refreshing marketplace cache (timeout: 120s)…\nCloning repository (timeout: 120s): https://github.com/samihalawa/spain-open-data.git\nClone complete, validating marketplace…\nCleaning up old marketplace cache…\n✔ Successfully added marketplace: spain-open-data (declared in user settings)\n"
+    },
+    {
+      "command": "claude plugin install spain-open-data@spain-open-data",
+      "exit_code": 0,
+      "output": "Installing plugin \"spain-open-data@spain-open-data\"...✔ Successfully installed plugin: spain-open-data@spain-open-data (scope: user)\n"
+    },
+    {
+      "command": "claude plugin list",
+      "exit_code": 0,
+      "output": "Installed plugins:\n\n  ❯ spain-open-data@spain-open-data\n    Version: 0.1.2\n    Scope: user\n    Status: ✔ enabled\n\n"
+    },
+    {
+      "command": "claude plugin details spain-open-data",
+      "exit_code": 0,
+      "output": "Spain Open Data (spain-open-data) 0.1.2\n  Description: Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.\n  Source: spain-open-data@spain-open-data\n\nComponent inventory\n  Skills (1)  spain-open-data\n  Agents (0)\n  Hooks (0)\n  MCP servers (0)\n  LSP servers (0)\n\nProjected token cost\n  Always-on:   ~50 tok   added to every session\n\nPer-component (rounded)\n  component        always-on  on-invoke\n  spain-open-data        ~50      ~1.3k\n\n  On-invoke cost is paid each time a skill or agent fires.\n  Token counts are estimates and may differ from actual usage.\n"
+    }
+  ],
+  "ok": true,
+  "scope": "Anonymous public-source installation and component discovery only; not a model-based task completion or Anthropic approval."
+}
