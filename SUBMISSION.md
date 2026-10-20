@@ -1,40 +1,31 @@
-# Claude directory submission — Spain Open Data
+# Claude review — Spain Open Data 0.2.0
 
-## Identity
-
-Publisher: **Sami Halawa**. Contact: **sami@samihalawa.com**. Plugin: `spain-open-data`. Release: `0.1.2`. Original software licence: MIT. Third-party data, service access and trademarks retain separate terms.
-
-## Source for the reviewer
+Publisher: Sami Halawa · Contact: sami@samihalawa.com
 
 Repository: https://github.com/samihalawa/spain-open-data
 
-Plugin folder: repository root (`.`)
+Plugin at repository root. Stable identity: `spain-open-data`.
 
-Direct folder URL: https://github.com/samihalawa/spain-open-data
+## Listing
 
-The plugin folder contains `.claude-plugin/plugin.json`, an actual icon, four HTTPS documentation/support/policy links, one focused skill, executable adapters and review examples. This is a standalone repository with no sibling-package dependency.
+Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.
 
-## Listing description
+Audience: Desarrolladores y equipos que buscan datos públicos reutilizables.
 
-Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.
+First prompt: Busca datasets de empleo y compáralos por formato, licencia y fecha.
 
-## First run
+## Reviewer walkthrough
 
-```bash
-claude plugin marketplace add samihalawa/spain-open-data
-claude plugin install spain-open-data@spain-open-data
-```
+Install with `/plugin install spain-open-data --marketplace samihalawa/spain-open-data`. Ask for an example: `demo` must be labelled as a saved snapshot, not live. The captured response is in `skills/spain-open-data/references/demo.json`. Run the live README example in an authorized Python 3.11+ environment, inspect scope and source dates, then export HTML. The report must not execute source text or load external assets.
 
-Prompt: **Find Spanish employment datasets with reusable formats and clear licences.**
+Negative fixtures in `tests/test_core.py` are synthetic regressions, not live user tests. No credentials, product account, purchase or API key is required. This is a skills package, not a hosted MCP service.
 
-Expected scope, sample interaction and negative scenarios are documented in the skill and `skills/spain-open-data/references/examples.md`. They are test specifications, not claims of completed user testing.
+## Included review materials
 
-## Access and data handling
+README, CHANGELOG, real icon, support/privacy/terms, static page source in docs/, saved official-source example, executable tests and versioned evidence. Dataset/service rights are separate from the MIT software licence.
 
-No reviewer credentials, account signup, payment or third-party API key is needed. Python 3.11+ and provider networking are required for direct adapter execution. The skill can also guide native browsing or supplied-document analysis on supported hosts. No unsupported host capability is promised. This is read-only software; it does not apply for funding, submit bids, look up protected owners or provide legal certification. Read the product's privacy, terms and source-reference files.
+## Scope
 
-## Validation and submission
+No descarga automáticamente distribuciones externas ni ejecuta archivos. No garantiza licencias o descargas vigentes. La fecha del catálogo no equivale al periodo del dato.
 
-Run `claude plugin validate --strict .` from this folder using Claude Code 2.1.281 or newer. The optional CI template at `ci/validate.yml` is not active. Actual local Claude strict-validation results are recorded in `evidence/claude-validation.json`; public-source installation is verified separately. Neither a template nor a package manifest constitutes a completed test.
-
-Submit this repository URL; the plugin is at its root through https://claude.ai/directory/manage under the verified publisher account. Official guidance: https://code.claude.com/docs/en/plugins/publish . Portal-specific checks, applicable publisher attestations and Anthropic review remain separate from source publication. Anthropic's directory and the separately curated `claude-plugins-official` marketplace are distinct routes. No submission, approval, official listing or adoption is claimed here.
+Read evidence for the actual completed checks. CI is an inactive template. Source publication, package validation, installation, user acceptance, directory review and adoption are separate states. No official listing or approval is claimed. Submit through https://claude.ai/directory/manage under the intended verified publisher identity; applicable publisher attestations remain with the owner.

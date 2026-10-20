@@ -6,6 +6,8 @@ import datetime as dt
 import difflib
 import hashlib
 import json
+import math
+import ssl
 import re
 import threading
 import time
@@ -19,7 +21,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
-VERSION = "0.1.2"
+VERSION = "0.2.0"
 MADRID = ZoneInfo("Europe/Madrid")
 BOE = "https://www.boe.es"
 BDNS = "https://www.infosubvenciones.es/bdnstrans/api"
@@ -68,13 +70,15 @@ def date_input(value: str = "") -> dt.date:
 
 
 def safe_url(url: str) -> str:
-    p = urllib.parse.urlsplit(url)
+    if not isinstance(url,str) or len(url)>8192 or any(ord(c)<32 for c in url):
+        raise SourceError("blocked_url","Invalid source URL.")
     try:
-        bad_port = p.port not in (None, 443)
+        p=urllib.parse.urlsplit(url)
+        invalid=(p.scheme!="https" or p.hostname not in ALLOWED_HOSTS or p.username or p.password or p.port not in (None,443) or p.fragment)
     except ValueError:
-        bad_port = True
-    if p.scheme != "https" or p.hostname not in ALLOWED_HOSTS or p.username or p.password or bad_port or p.fragment:
-        raise SourceError("blocked_url", "Only HTTPS requests to the configured official-source allowlist are permitted.")
+        invalid=True
+    if invalid:
+        raise SourceError("blocked_url","Only HTTPS requests to the configured official-source allowlist are permitted.")
     return url
 
 
@@ -103,7 +107,7 @@ class Fetch:
 
     def xml(self) -> ET.Element:
         # Reject DTD/entity declarations before using the standard-library XML parser.
-        if re.search(br"<!\s*(DOCTYPE|ENTITY)\b", self.body, re.I):
+        if re.search(br"<!\s*(DOCTYPE|ENTITY)\b", self.body.replace(b"\x00", b""), re.I):
             raise SourceError("unsafe_xml", "DTD/entity declarations are not accepted.", self.url)
         try:
             return ET.fromstring(self.body)
@@ -166,6 +170,8 @@ class OfficialClient:
                 code = "source_not_found" if exc.code == 404 else "source_rate_limited" if exc.code == 429 else "source_http_error"
                 raise SourceError(code, f"Official source returned HTTP {exc.code}; this is not evidence of no results.", url) from exc
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
+                if isinstance(exc, ssl.SSLError) or isinstance(getattr(exc, "reason", None), ssl.SSLError):
+                    raise SourceError("source_tls_error", "TLS certificate verification failed in this Python runtime. Check its trusted CA certificates; verification was not disabled.", url) from exc
                 raise SourceError("source_unavailable", "The official source could not be reached; no result was inferred.", url) from exc
         raise SourceError("source_unavailable", "Official source did not respond.", url)
 
@@ -225,69 +231,102 @@ def link_value(value: Any) -> str | None:
     return value.get("texto") if isinstance(value, dict) else value if isinstance(value, str) else None
 
 
-def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 20, cursor: str = "") -> dict[str, Any]:
-    """Search a bounded window of PLACSP's official Atom feed, not all Spanish tenders. Returns a continuation cursor and explicit coverage. Does not submit bids."""
-    query = text_input(query, "query")
-    cpv_prefix = text_input(cpv_prefix, "cpv_prefix", 8)
-    if cpv_prefix and not re.fullmatch(r"\d{2,8}", cpv_prefix):
-        raise SourceError("invalid_input", "cpv_prefix must contain 2–8 digits.")
-    integer(max_pages, "max_pages", 1, 3); integer(limit, "limit", 1, 50)
-    url = PLACSP
-    if cursor:
-        safe_url(cursor)
-        p = urllib.parse.urlsplit(cursor)
-        if p.hostname != "contrataciondelestado.es" or p.query or not re.fullmatch(r"/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3(?:_[0-9_]+)?\.atom", p.path):
-            raise SourceError("invalid_input", "cursor must be a continuation URL returned by this PLACSP feed.")
-        url = cursor
-    rows, sources, seen, deleted, visited = [], [], set(), set(), set()
-    scanned = matched = 0
-    next_url = None
+def deadline_assessment(start: Any = None, end: Any = None, as_of: str = "") -> dict[str, Any]:
+    """Date-only triage, never a legal open/closed or eligibility determination."""
+    today=date_input(as_of)
+    def parse(v):
+        try:
+            return dt.date.fromisoformat(v[:10]) if isinstance(v,str) and re.match(r"^\d{4}-\d{2}-\d{2}(?:$|T| )",v) else None
+        except ValueError:
+            return None
+    a,b=parse(start),parse(end)
+    if a and b and a>b: state="conflicting_dates"
+    elif start not in (None,"") and a is None or end not in (None,"") and b is None: state="unrecognized_date"
+    elif a and today<a: state="not_started_by_date"
+    elif b and today>b: state="past_end_date"
+    elif b and today==b: state="ends_today_check_time"
+    elif b and a and a<=today<b: state="within_published_dates"
+    elif b and today<b: state="end_date_ahead_start_unverified"
+    else: state="deadline_not_established"
+    return {"as_of":today.isoformat(),"date_state":state,"start_date":start,"end_date":end,"eligibility_verified":False,"portal_status_verified":False}
+
+
+def _bulletin_data(f: Fetch) -> dict[str, Any]:
+    body=f.json()
+    if not isinstance(body,dict) or not isinstance(body.get("status"),dict):
+        raise SourceError("schema_changed","Missing official bulletin response status.",f.url)
+    code=str(body["status"].get("code",""))
+    if code!="200":
+        raise SourceError("source_not_found" if code=="404" else "source_reported_error","The bulletin service did not return a successful issue.",f.url)
+    data=body.get("data");summary=data.get("sumario") if isinstance(data,dict) else None
+    if not isinstance(summary,dict) or not isinstance(summary.get("diario"),(list,dict)):
+        raise SourceError("schema_changed","Missing official issue structure; no empty result was inferred.",f.url)
+    return data
+
+
+def _feed_url(url: str) -> str:
+    safe_url(url);p=urllib.parse.urlsplit(url)
+    if p.hostname!="contrataciondelestado.es" or p.query or not re.fullmatch(r"/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3(?:_[0-9_]+)?\.atom",p.path):
+        raise SourceError("invalid_input","Use a continuation URL returned by this PLACSP feed.")
+    return url
+
+
+def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 20, cursor: str = "", offset: int = 0, deadline_from: str = "") -> dict[str, Any]:
+    """Search a bounded PLACSP feed window with lossless within-page continuation. Optional deadline_from filters dates, not legal application status."""
+    query=text_input(query,"query");cpv_prefix=text_input(cpv_prefix,"cpv_prefix",8)
+    if cpv_prefix and not re.fullmatch(r"\d{2,8}",cpv_prefix):raise SourceError("invalid_input","cpv_prefix must contain 2–8 digits.")
+    integer(max_pages,"max_pages",1,3);integer(limit,"limit",1,50);integer(offset,"offset",0,100000)
+    threshold=date_input(deadline_from) if deadline_from else None
+    url=_feed_url(cursor or PLACSP);rows=[];sources=[];seen=set();deleted=set();visited=set();scanned=0;unknown_deadlines=0;errors=[]
+    next_url=None;next_offset=None;stopped=False;offset_on_page=offset
     for _ in range(max_pages):
-        if url in visited:
-            break
+        if url in visited:raise SourceError("schema_changed","The source returned a cyclic continuation link.",url)
         visited.add(url)
-        f = CLIENT.get(url, accept="application/atom+xml")
+        try:
+            f=CLIENT.get(_feed_url(url),accept="application/atom+xml");root=f.xml()
+            if root.tag!="{http://www.w3.org/2005/Atom}feed":raise SourceError("schema_changed","Expected an official Atom feed.",f.url)
+        except SourceError as exc:
+            if not sources:raise
+            errors.append({"code":exc.code,"message":str(exc),"source_url":exc.source_url});next_url=url;next_offset=offset_on_page;break
         sources.append(f)
-        root = f.xml()
-        for tombstone in descendants(root, "deleted-entry"):
-            deleted.add(tombstone.attrib.get("ref", ""))
-        for entry in [e for e in root if local_name(e.tag) == "entry"]:
-            eid = path_text(entry, "id")
-            if not eid or eid in seen or eid in deleted:
-                continue
-            seen.add(eid); scanned += 1
-            title = path_text(entry, "title") or ""
-            searchable = fold(inner_text(entry))
-            cpvs = [inner_text(e) for e in descendants(entry, "ItemClassificationCode")]
-            if query and not all(term in searchable for term in fold(query).split()):
-                continue
-            if cpv_prefix and not any(c.startswith(cpv_prefix) for c in cpvs):
-                continue
-            matched += 1
-            if len(rows) >= limit:
-                continue
-            status_nodes = descendants(entry, "ContractFolderStatus")
-            status = status_nodes[0] if status_nodes else entry
-            project = descendants(status, "ProcurementProject")
-            budget = descendants(project[0], "BudgetAmount") if project else []
-            parties = descendants(status, "LocatedContractingParty")
-            deadlines = descendants(status, "TenderSubmissionDeadlinePeriod")
-            docs = []
-            for ref in descendants(status, "DocumentReference") + descendants(status, "LegalDocumentReference") + descendants(status, "TechnicalDocumentReference"):
-                for u in descendants(ref, "URI"):
-                    val = inner_text(u)
-                    if val.startswith(("https://", "http://")):
-                        docs.append(val)
-            hrefs = [e.attrib.get("href") for e in entry if local_name(e.tag) == "link" and e.attrib.get("rel", "alternate") == "alternate"]
-            rows.append({"id": eid, "title": title, "official_url": hrefs[0] if hrefs else eid, "updated": path_text(entry, "updated"), "reference": first_text(status, "ContractFolderID"), "status_code": first_text(status, "ContractFolderStatusCode"), "authority": first_text(parties[0], "Name") if parties else None, "cpv": cpvs, "budget_excluding_tax": first_text(budget[0], "TaxExclusiveAmount") if budget else None, "currency": next((e.attrib.get("currencyID") for e in budget[0] if local_name(e.tag) == "TaxExclusiveAmount"), None) if budget else None, "deadline_date": first_text(deadlines[0], "EndDate") if deadlines else None, "deadline_time": first_text(deadlines[0], "EndTime") if deadlines else None, "document_urls": list(dict.fromkeys(docs))})
-        next_url = next((e.attrib.get("href") for e in root if local_name(e.tag) == "link" and e.attrib.get("rel") == "next"), None)
-        if not next_url:
-            break
-        url = next_url
-    warnings = ["Bounded feed search, not exhaustive national discovery. Recent feed updates can describe closed, awarded or cancelled tenders. Check the official procurement profile and full tender documents before deciding eligibility or deadlines."]
-    if matched > len(rows):
-        warnings.append("The result limit truncated matches within scanned pages. Increase limit or narrow the query; the cursor advances after the scanned pages.")
-    return envelope(rows, sources, warnings, pages_scanned=len(sources), entries_scanned=scanned, matches_in_scanned_pages=matched, returned=len(rows), truncated=matched > len(rows), next_cursor=next_url, exhaustive=False)
+        deleted.update(e.attrib.get("ref","") for e in descendants(root,"deleted-entry"))
+        entries=[e for e in root if local_name(e.tag)=="entry"]
+        if offset_on_page>len(entries):raise SourceError("invalid_input","Offset exceeds this feed page; start again because the live feed may have changed.",f.url)
+        for index in range(offset_on_page,len(entries)):
+            entry=entries[index];eid=path_text(entry,"id")
+            if not eid or eid in seen or eid in deleted:continue
+            scanned+=1;title=path_text(entry,"title") or "";cpvs=list(dict.fromkeys(inner_text(e) for e in descendants(entry,"ItemClassificationCode")))
+            if query and not all(t in fold(inner_text(entry)) for t in fold(query).split()):continue
+            if cpv_prefix and not any(c.startswith(cpv_prefix) for c in cpvs):continue
+            status_nodes=descendants(entry,"ContractFolderStatus");status=status_nodes[0] if status_nodes else entry
+            deadlines=descendants(status,"TenderSubmissionDeadlinePeriod");end=first_text(deadlines[0],"EndDate") if deadlines else None
+            assessment=deadline_assessment(end=end)
+            if threshold:
+                try:parsed=dt.date.fromisoformat(end or "")
+                except (ValueError,TypeError):unknown_deadlines+=1;continue
+                if parsed<threshold:continue
+            if len(rows)>=limit:
+                next_url=url;next_offset=index;stopped=True;break
+            seen.add(eid)
+            project=descendants(status,"ProcurementProject");budget=descendants(project[0],"BudgetAmount") if project else []
+            parties=descendants(status,"LocatedContractingParty");docs=[]
+            for ref in descendants(status,"DocumentReference")+descendants(status,"LegalDocumentReference")+descendants(status,"TechnicalDocumentReference"):
+                docs.extend(inner_text(u) for u in descendants(ref,"URI") if inner_text(u).startswith(("https://","http://")))
+            hrefs=[e.attrib.get("href") for e in entry if local_name(e.tag)=="link" and e.attrib.get("rel","alternate")=="alternate"]
+            rows.append({"id":eid,"title":title,"official_url":hrefs[0] if hrefs else eid,"updated":path_text(entry,"updated"),"reference":first_text(status,"ContractFolderID"),"status_code":first_text(status,"ContractFolderStatusCode"),"authority":first_text(parties[0],"Name") if parties else None,"cpv":cpvs,"budget_excluding_tax":first_text(budget[0],"TaxExclusiveAmount") if budget else None,"currency":next((e.attrib.get("currencyID") for e in budget[0] if local_name(e.tag)=="TaxExclusiveAmount"),None) if budget else None,"deadline_date":end,"deadline_time":first_text(deadlines[0],"EndTime") if deadlines else None,"deadline_assessment":assessment,"document_urls":list(dict.fromkeys(docs))})
+        if stopped:break
+        next_url=next((e.attrib.get("href") for e in root if local_name(e.tag)=="link" and e.attrib.get("rel")=="next"),None)
+        next_offset=0 if next_url else None
+        if not next_url:break
+        url=_feed_url(next_url);offset_on_page=0
+    rows=[r for r in rows if r['id'] not in deleted]
+    warnings=["Bounded feed window, not all Spanish tenders. A future deadline does not establish an open procedure; verify status, lots, amendments and the official profile.","Continuation preserves within-page matches. Live feed pages can change; deduplicate stable tender IDs across calls."]
+    if threshold:warnings.append("deadline_from excludes missing/unparseable deadlines; these exclusions are counted separately.")
+    next_args={"query":query,"cpv_prefix":cpv_prefix,"max_pages":max_pages,"limit":limit,"cursor":next_url,"offset":next_offset,"deadline_from":deadline_from} if next_url else None
+    result=envelope(rows,sources,warnings,pages_fetched=len(sources),entries_examined=scanned,returned=len(rows),result_limit_reached=stopped,next_cursor=next_url,next_offset=next_offset,next_request=next_args,unknown_deadlines_excluded=unknown_deadlines,deleted_ids_observed=len(deleted),partial=bool(errors),exhaustive=False)
+    if errors:
+        result["errors"]=errors;result["warnings"].append("A later feed page could not be read. Earlier results are preserved; do not claim that the complete requested window was checked.")
+    return result
 
 
 def ayudas_search(query: str, page: int = 0, page_size: int = 10) -> dict[str, Any]:
@@ -314,7 +353,7 @@ def ayudas_call(bdns_number: str) -> dict[str, Any]:
         raise SourceError("invalid_input", "bdns_number must be the public numeric BDNS call number.")
     f = CLIENT.get(BDNS + "/convocatorias", {"numConv": bdns_number})
     body = f.json()
-    if not isinstance(body, dict) or not body:
+    if not isinstance(body, dict) or str(body.get("codigoBDNS", "")) != bdns_number:
         raise SourceError("schema_changed", "BDNS did not return a call object.", f.url)
     return envelope(body, [f], ["This is a published call record, not an eligibility determination. Official bases, amendments and the application portal take precedence. A direct award is not an open application opportunity."], bdns_number=bdns_number)
 
@@ -323,8 +362,8 @@ def boe_daily(date: str, query: str = "", limit: int = 30) -> dict[str, Any]:
     """Read a specific BOE issue and filter item titles. Returns official identifiers and links, not an exhaustive search of legislation."""
     d = date_input(date); query = text_input(query, "query"); integer(limit, "limit", 1, 100)
     f = CLIENT.get(f"{BOE}/datosabiertos/api/boe/sumario/{d:%Y%m%d}")
-    body = f.json()
-    items = list(bulletin_items(body.get("data", {})))
+    body = _bulletin_data(f)
+    items = list(bulletin_items(body))
     found = [r for r in items if all(t in fold(r.get("titulo", "")) for t in fold(query).split())]
     rows = [{"id": r["identificador"], "title": r["titulo"], "html_url": r.get("url_html"), "xml_url": r.get("url_xml"), "pdf_url": link_value(r.get("url_pdf")), "context": r["context"]} for r in found[:limit]]
     return envelope(rows, [f], ["Title matching only, within this issue. Publication date is not necessarily entry-into-force date."], date=d.isoformat(), matching_items=len(found), returned=len(rows), truncated=len(found)>limit)
@@ -395,7 +434,7 @@ def boe_compare(law_id: str, block_id: str, older_date: str, newer_date: str) ->
         raise SourceError("version_unavailable", "The source has no version for one of the requested dates; no text was invented.",f.url)
     ta = [inner_text(e) for e in a]; tb = [inner_text(e) for e in b]
     diff = "\n".join(difflib.unified_diff(ta,tb,fromfile=older_date,tofile=newer_date,lineterm=""))
-    return envelope({"law_id":law_id,"block_id":block_id,"older_version":dict(a.attrib),"newer_version":dict(b.attrib),"changed":ta!=tb,"unified_diff":diff[:100000]},[f],["Text comparison is not an assessment of legal effect. Check the amending act and transitional provisions."],truncated=len(diff)>100000)
+    return envelope({"law_id":law_id,"block_id":block_id,"older_version":dict(a.attrib),"newer_version":dict(b.attrib),"changed":ta!=tb,"older_date":older_date,"newer_date":newer_date,"older_text":"\n".join(ta)[:60000],"newer_text":"\n".join(tb)[:60000],"text_truncated":len("\n".join(ta))>60000 or len("\n".join(tb))>60000,"unified_diff":diff[:100000]},[f],["Text comparison is not an assessment of legal effect. Check the amending act and transitional provisions."],truncated=len(diff)>100000)
 
 
 def borme_company_notices(company: str, date: str, province: str = "MADRID", limit: int = 20) -> dict[str, Any]:
@@ -405,7 +444,7 @@ def borme_company_notices(company: str, date: str, province: str = "MADRID", lim
         raise SourceError("invalid_input","Use at least three characters of a company name.")
     province = text_input(province,"province",80,False); d=date_input(date); integer(limit,"limit",1,50)
     summary = CLIENT.get(f"{BOE}/datosabiertos/api/borme/sumario/{d:%Y%m%d}")
-    items = [r for r in bulletin_items(summary.json().get("data",{})) if fold(r.get("titulo",""))==fold(province) and r.get("identificador","").startswith("BORME-A-")]
+    items = [r for r in bulletin_items(_bulletin_data(summary)) if fold(r.get("titulo",""))==fold(province) and r.get("identificador","").startswith("BORME-A-")]
     if not items:
         return envelope([], [summary], ["No matching province issue was present on this date. This does not prove that the company has no filings."],date=d.isoformat(),province=province,documents_scanned=0,complete_company_history=False)
     sources=[summary]; rows=[]; matches=0
@@ -429,7 +468,7 @@ def borme_company_notices(company: str, date: str, province: str = "MADRID", lim
                 matches+=1
                 if len(rows)<limit:
                     rows.append({"heading":r["heading"],"text":"\n".join(r["paragraphs"]),"document_id":ident,"official_url":f"{BOE}/diario_borme/txt.php?id={ident}","publication_date":d.isoformat(),"province":province})
-    return envelope(rows,sources,["Company-name matching is not identity proof. Resolve company name and registry identifiers, distinguish filing/publication/event dates, and inspect later corrections. Do not infer insolvency or misconduct from a notice."],documents_scanned=len(sources)-1,matches=matches,returned=len(rows),truncated=matches>limit,complete_company_history=False)
+    return envelope(rows,sources,["Company-name matching is not identity proof. Resolve company name and registry identifiers, distinguish filing/publication/event dates, and inspect later corrections. Do not infer insolvency or misconduct from a notice."],date=d.isoformat(),province=province,documents_scanned=len(sources)-1,matches=matches,returned=len(rows),truncated=matches>limit,complete_company_history=False)
 
 
 def _reference(reference: str) -> str:
@@ -449,51 +488,66 @@ def catastro_property(reference: str) -> dict[str, Any]:
     if not isinstance(body,dict):
         raise SourceError("schema_changed","Catastro did not return the expected non-protected-data result.",f.url)
     if body.get("lerr"):
-        return envelope({"reference":reference,"source_errors":body["lerr"],"property":None},[f],["The cadastral service reported an error; no property facts were inferred."],matched=False)
+        raise SourceError("source_reported_error","The cadastral service reported an error for this reference; no property facts were inferred.",f.url)
     bico=body.get("bico") or {}; bi=bico.get("bi") or {}; details=bi.get("debi") or {}; parcel=bico.get("finca") or {}
     constructions=[{"use":c.get("lcd"),"area_m2":(c.get("dfcons") or {}).get("stl"),"type":(c.get("dvcons") or {}).get("dtip")} for c in as_list(bico.get("lcons")) if isinstance(c,dict)]
     data={"reference":reference,"address":bi.get("ldt"),"use":details.get("luso"),"built_area_m2":details.get("sfc"),"construction_year":details.get("ant"),"participation_percent":details.get("cpt"),"parcel_area_m2":(parcel.get("dff") or {}).get("ss"),"parcel_type":parcel.get("ltp"),"map_url":(parcel.get("infgraf") or {}).get("igraf"),"construction_units":constructions}
     if not bi:
-        data["candidate_properties"]=body.get("lrcdnp",[])
+        if not body.get("lrcdnp"):raise SourceError("schema_changed","No property or candidate-property records were returned.",f.url)
+        data["candidate_properties"]=body["lrcdnp"]
     return envelope(data,[f],["Source: Dirección General del Catastro. Non-protected descriptive data only. Cadastre is not proof of title, planning permission, occupancy legality, boundaries on the ground or market value. Navarra and the Basque Country have separate cadastral systems."],single_property=bool(bi))
 
 
 def catastro_coordinates(reference: str) -> dict[str, Any]:
-    """Obtain the official cadastral reference point in EPSG:4326. It is not a parcel boundary or survey."""
+    """Return labelled longitude/latitude in EPSG:4326 from the official cadastral reference point, not a surveyed boundary."""
     reference=_reference(reference)
     f=CLIENT.get(f"{CATASTRO}/COVCCoordenadas.svc/json/Consulta_CPMRC",{"Provincia":"","Municipio":"","SRS":"EPSG:4326","RefCat":reference[:14]})
-    body=f.json()
-    return envelope(body,[f],["Reference point only, not surveyed boundaries. Coordinate order must follow the source fields and CRS."],reference=reference,crs="EPSG:4326")
+    body=f.json();result=body.get("Consulta_CPMRCResult") if isinstance(body,dict) else None
+    if not isinstance(result,dict):raise SourceError("schema_changed","Missing cadastral coordinates response.",f.url)
+    if result.get("lerr"):raise SourceError("source_reported_error","Catastro reported a coordinate error.",f.url)
+    points=(result.get("coordenadas") or {}).get("coord");rows=[]
+    for item in as_list(points):
+        geo=item.get("geo",{})
+        if geo.get("srs")!="EPSG:4326":raise SourceError("schema_changed","Unexpected coordinate reference system.",f.url)
+        try:lon=float(geo['xcen']);lat=float(geo['ycen'])
+        except (KeyError,TypeError,ValueError):raise SourceError("schema_changed","Invalid coordinate values.",f.url)
+        if not(math.isfinite(lon) and math.isfinite(lat) and -180<=lon<=180 and -90<=lat<=90):raise SourceError("schema_changed","Coordinate values are out of range.",f.url)
+        rows.append({"longitude":lon,"latitude":lat,"crs":"EPSG:4326","label":item.get("ldt")})
+    if not rows:raise SourceError("source_not_found","No reference point was returned.",f.url)
+    return envelope({"reference":reference,"points":rows},[f],["Reference points only, not surveyed boundaries; longitude and latitude are explicitly labelled."],reference=reference,crs="EPSG:4326")
 
 
-def ine_operations(query: str = "", limit: int = 30) -> dict[str, Any]:
+def ine_operations(query: str = "", limit: int = 30, offset: int = 0) -> dict[str, Any]:
     """Discover official INE statistical operations by name. Use returned operation IDs; do not guess table IDs or series codes."""
     query=text_input(query,"query"); integer(limit,"limit",1,100)
+    integer(offset,"offset",0,100000)
     f=CLIENT.get(f"{INE}/OPERACIONES_DISPONIBLES")
     body=f.json()
     if not isinstance(body,list): raise SourceError("schema_changed","Expected an INE operations array.",f.url)
     rows=[r for r in body if all(t in fold(r.get("Nombre","")) for t in fold(query).split())]
-    return envelope(rows[:limit],[f],[],matches=len(rows),truncated=len(rows)>limit)
+    return envelope(rows[offset:offset+limit],[f],[],matches=len(rows),truncated=offset+limit<len(rows),offset=offset,next_offset=offset+limit if offset+limit<len(rows) else None)
 
 
-def ine_tables(operation_id: int, query: str = "", limit: int = 30) -> dict[str, Any]:
+def ine_tables(operation_id: int, query: str = "", limit: int = 30, offset: int = 0) -> dict[str, Any]:
     """List tables for an INE operation, optionally filtering titles. Retrieves catalog metadata, not observations."""
     integer(operation_id,"operation_id",1,100000); integer(limit,"limit",1,100); query=text_input(query,"query")
+    integer(offset,"offset",0,100000)
     f=CLIENT.get(f"{INE}/TABLAS_OPERACION/{operation_id}")
     body=f.json()
     if not isinstance(body,list): raise SourceError("schema_changed","Expected an INE tables array.",f.url)
     rows=[r for r in body if all(t in fold(r.get("Nombre","")) for t in fold(query).split())]
-    return envelope(rows[:limit],[f],[],matches=len(rows),truncated=len(rows)>limit)
+    return envelope(rows[offset:offset+limit],[f],[],matches=len(rows),truncated=offset+limit<len(rows),offset=offset,next_offset=offset+limit if offset+limit<len(rows) else None)
 
 
-def ine_table_series(table_id: int, page: int = 1, query: str = "", limit: int = 20) -> dict[str, Any]:
+def ine_table_series(table_id: int, page: int = 1, query: str = "", limit: int = 20, offset: int = 0) -> dict[str, Any]:
     """Discover series codes in one INE table page. Native provider pagination begins at page 1; output may be filtered locally."""
     integer(table_id,"table_id",1,10000000); integer(page,"page",1,10000);integer(limit,"limit",1,100);query=text_input(query,"query")
+    integer(offset,"offset",0,100000)
     f=CLIENT.get(f"{INE}/SERIES_TABLA/{table_id}",{"page":page})
     body=f.json()
     if not isinstance(body,list): raise SourceError("schema_changed","Expected an INE series array.",f.url)
     rows=[r for r in body if all(t in fold(r.get("Nombre","")) for t in fold(query).split())]
-    return envelope(rows[:limit],[f],["This is one provider page; an empty filtered page does not mean no matching series exist elsewhere in the table."],page=page,provider_records=len(body),matches_on_page=len(rows),truncated=len(rows)>limit,next_page=page+1 if body else None,exhaustive=False)
+    return envelope(rows[offset:offset+limit],[f],["This is one provider page; an empty filtered page does not mean no matching series exist elsewhere in the table."],page=page,provider_records=len(body),matches_on_page=len(rows),truncated=offset+limit<len(rows),offset=offset,next_offset=offset+limit if offset+limit<len(rows) else None,next_page=page if offset+limit<len(rows) else page+1 if body else None,exhaustive=False)
 
 
 def ine_series(series_code: str, last: int = 12) -> dict[str, Any]:
@@ -538,14 +592,15 @@ def normalize_dataset(r: dict[str, Any]) -> dict[str, Any]:
     for d in as_list(r.get("distribution")):
         if isinstance(d,dict):
             distributions.append({"title":language_value(d.get("title")),"format":d.get("format"),"access_url":d.get("accessURL"),"download_url":d.get("downloadURL"),"license":d.get("license"),"byte_size":d.get("byteSize")})
-    return {"catalog_url":r.get("_about"),"title":language_value(r.get("title")),"description":language_value(r.get("description")),"publisher":r.get("publisher"),"issued":r.get("issued"),"modified":r.get("modified"),"license":r.get("license"),"spatial":r.get("spatial"),"temporal":r.get("temporal"),"distributions":distributions}
+    return {"dataset_id":urllib.parse.urlsplit(r.get("_about","")).path.rstrip("/").rsplit("/",1)[-1],"catalog_url":r.get("_about"),"title":language_value(r.get("title")),"description":language_value(r.get("description")),"publisher":r.get("publisher"),"issued":r.get("issued"),"modified":r.get("modified"),"license":r.get("license"),"spatial":r.get("spatial"),"temporal":r.get("temporal"),"distributions":distributions}
 
 
 def open_data_search(query: str, page: int = 0, page_size: int = 10) -> dict[str, Any]:
     """Search titles in the official datos.gob.es metadata catalog. Returns original publishers and distribution links; it does not ingest third-party datasets."""
     query=text_input(query,"query",160,False);integer(page,"page",0,10000);integer(page_size,"page_size",1,50)
     f=CLIENT.get(f"{DATOS}/title/{urllib.parse.quote(query,safe='')}.json",{"_page":page,"_pageSize":page_size})
-    body=f.json().get("result",{})
+    raw=f.json();body=raw.get("result") if isinstance(raw,dict) else None
+    if not isinstance(body,dict) or not isinstance(body.get("items"),list):raise SourceError("schema_changed","Expected a catalog items array; no empty search was inferred.",f.url)
     rows=[normalize_dataset(r) for r in as_list(body.get("items")) if isinstance(r,dict)]
     return envelope(rows,[f],["Catalog metadata may be stale. Verify the original publisher, download availability, dataset-specific reuse licence, schema, units and update date before using data. No downstream distribution URL is fetched automatically."],page=page,page_size=page_size,next_page=page+1 if body.get("next") else None)
 
@@ -562,11 +617,49 @@ def open_data_dataset(dataset_id: str) -> dict[str, Any]:
     if not isinstance(item,dict): raise SourceError("schema_changed","No dataset metadata record was returned.",f.url)
     return envelope(normalize_dataset(item),[f],["Rights in each dataset and distribution are separate from the MIT licence on this software. Missing licence metadata is not permission to redistribute."],dataset_id=dataset_id)
 
+def ayudas_shortlist(query: str, page: int = 0, limit: int = 5, as_of: str = "") -> dict[str, Any]:
+    """Search and inspect up to five BDNS records. Distinguishes date triage and direct-award signals from verified eligibility; partial failures stay visible."""
+    integer(limit,"limit",1,5);day=date_input(as_of).isoformat()
+    search=ayudas_search(query,page=page,page_size=limit);rows=[];sources=list(search['sources']);errors=[]
+    for row in search['data']:
+        try:
+            result=ayudas_call(row['bdns_number']);detail=result['data'];sources.extend(result['sources'])
+            label=fold(str(detail.get('tipoConvocatoria',''))+' '+str(detail.get('descripcion','')))
+            direct=any(word in label for word in ('nominativa','concesion directa','subvencion directa'))
+            rows.append({**row,'call_type':detail.get('tipoConvocatoria'),'direct_award_signal':direct,'budget_total_eur':detail.get('presupuestoTotal'),'beneficiary_types':detail.get('tiposBeneficiarios'),'regions':detail.get('regiones'),'deadline_assessment':deadline_assessment(detail.get('fechaInicioSolicitud'),detail.get('fechaFinSolicitud'),day),'bases_url':detail.get('urlBasesReguladoras'),'application_url':detail.get('sedeElectronica'),'raw_abierto':detail.get('abierto'),'application_status':'official_bases_and_portal_not_verified'})
+        except SourceError as exc:
+            error={'bdns_number':row['bdns_number'],'code':exc.code,'message':str(exc),'source_url':exc.source_url};errors.append(error);rows.append({**row,'detail_error':error})
+    result={'ok':True,'data':rows,'sources':list({x['url']:x for x in sources}.values()),'coverage':{**search['coverage'],'details_checked':len(rows)-len(errors),'partial':bool(errors),'as_of':day},'warnings':search['warnings']+['Date triage is not an open-call certification. The source abierto flag is preserved, not used as a definitive open/closed flag. Direct-award text signals require checking the actual legal bases.'],'notice':SOURCE_NOTICE}
+    if errors:result['errors']=errors
+    return result
+
+
+def borme_company_range(company: str, start_date: str, end_date: str, province: str = "MADRID", limit: int = 20) -> dict[str, Any]:
+    """Inspect one company/province over up to seven explicit days, preserving missing issues and failures. User-initiated lookup, not monitoring."""
+    start,end=date_input(start_date),date_input(end_date)
+    if not start_date or not end_date or not 0<=(end-start).days<=6:raise SourceError("invalid_input","Choose an explicit inclusive range of 1–7 days.")
+    company=text_input(company,"company",160,False);province=text_input(province,"province",80,False);integer(limit,"limit",1,50)
+    if len(company)<3:raise SourceError("invalid_input","Use at least three characters of a company name.")
+    rows=[];sources=[];days=[];errors=[];truncated=False
+    for offset in range((end-start).days+1):
+        day=(start+dt.timedelta(days=offset)).isoformat()
+        try:
+            item=borme_company_notices(company,day,province,limit)
+            days.append({'date':day,'status':'checked','matches':item['coverage'].get('matches',0),'documents_scanned':item['coverage']['documents_scanned']})
+            rows.extend(item['data']);sources.extend(item['sources']);truncated|=item['coverage'].get('truncated',False)
+        except SourceError as exc:
+            error={'date':day,'code':exc.code,'message':str(exc),'source_url':exc.source_url};errors.append(error);days.append({'date':day,'status':'unavailable','error':error})
+    out={'ok':len(errors)<len(days),'data':rows[:limit],'sources':list({x['url']:x for x in sources}.values()),'coverage':{'company_query':company,'province':province,'start_date':start_date,'end_date':end_date,'days':days,'partial':bool(errors),'returned':min(limit,len(rows)),'truncated':truncated or len(rows)>limit,'complete_company_history':False},'warnings':['A missing/unavailable issue is not a no-filings result. Names are matches, not certified entity identity. No automatic monitoring is running.'],'notice':SOURCE_NOTICE}
+    if errors:out['errors']=errors
+    if not out['ok']:out['error']={'code':'source_unavailable','message':'No day in the requested range could be checked.'}
+    return out
+
+
 PRODUCT_TOOLS: dict[str,list[Callable[...,dict[str,Any]]]] = {
     "licita-espana":[licita_search],
-    "ayudas-espana":[ayudas_search,ayudas_call],
+    "ayudas-espana":[ayudas_search,ayudas_call,ayudas_shortlist],
     "boe-impact":[boe_daily,boe_document,boe_consolidated,boe_compare],
-    "borme-intelligence":[borme_company_notices],
+    "borme-intelligence":[borme_company_notices,borme_company_range],
     "catastro-pro":[catastro_property,catastro_coordinates],
     "ine-evidence":[ine_operations,ine_tables,ine_table_series,ine_series],
     "spain-open-data":[open_data_search,open_data_dataset],
@@ -575,7 +668,7 @@ TOOLS = {f.__name__:f for functions in PRODUCT_TOOLS.values() for f in functions
 
 
 def call_tool(name: str, arguments: dict[str, Any]) -> dict[str, Any]:
-    if name not in TOOLS:
+    if not isinstance(name, str) or name not in TOOLS:
         return {"ok":False,"error":{"code":"unknown_tool","message":"Unknown tool name."}}
     if not isinstance(arguments,dict):
         return {"ok":False,"error":{"code":"invalid_input","message":"Tool arguments must be a JSON object."}}

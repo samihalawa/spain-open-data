@@ -1,4 +1,4 @@
-# Data practices — local skills release 0.1.2
+# Data practices — local skills release 0.2.0
 
 This release contains reusable assistant instructions and local source adapters. It does not provision a publisher-operated server, user account, analytics system or payment system. The source code makes read-only requests to the official data providers listed in the product's sources document. Those requests necessarily include the search text, document identifier, date or cadastral reference needed for the task, and the provider sees the network address of the executing runtime. Do not include credentials or unrelated personal data in queries.
 
@@ -9,3 +9,8 @@ Native browsing follows the host assistant's own data handling, which is separat
 This document describes the distributed local release. A future hosted MCP service must disclose its actual operator, hosting, logs, retention, security, processors and user-rights contact before deployment or public submission. No such hosted service is part of this release.
 
 Publisher contact: sami@samihalawa.com. Do not send secrets or protected documents in support requests.
+
+
+## Saved examples and exported reports
+
+Small labelled snapshots of public official records enable offline demonstrations; they are not user-submitted files. Exporting writes only to the path selected by the user. Reports include no JavaScript, analytics or external assets. Review them before sharing. Static product pages use no account or analytics system. If served through GitHub Pages, GitHub operates the hosting and may process connection logs under its policies, separate from this software.

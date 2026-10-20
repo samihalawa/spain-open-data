@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "verified_at": "2026-10-20T16:29:03.394812+00:00",
+  "distinct_tests": 64,
+  "strict_plugin_validation": "passed",
+  "strict_marketplace_validation": "passed",
+  "live_adapter_tests": {
+    "passed": 2,
+    "total": 2
+  },
+  "browser_views_passed": 4,
+  "shared_module_hashes": {
+    "core.py": "0e320baf7c3f49e3fbe97b53f125d2910d46c723534f4bf09a4c9799fe579ac1",
+    "presentation.py": "a1e426662bdaf4e09e2bf60c0b1815ee96154795560a38e702328be58279e0dc",
+    "__main__.py": "c0c4a6a1425c9cfc9cf8c2db82c46133ad82f74aab36b9055614b1750b63167e"
+  },
+  "main_skill_word_count": {
+    "before": 700,
+    "after": 441
+  },
+  "scope": "Fixture/CLI tests, official-provider smoke checks, native validators and isolated browser layout checks. No model-based acceptance, adoption or directory approval claimed."
+}

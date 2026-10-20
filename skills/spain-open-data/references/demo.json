@@ -1,0 +1,108 @@
+{
+  "tool": "open_data_search",
+  "arguments": {
+    "query": "empleo",
+    "page_size": 3
+  },
+  "captured_at": "2026-10-20T16:20:04.937305+00:00",
+  "note": "Saved public-source example, not a current query or user-owned record.",
+  "result": {
+    "ok": true,
+    "data": [
+      {
+        "dataset_id": "l01281317-ofertas-de-empleo-publico-y-convocatorias-del-ayuntamiento",
+        "catalog_url": "https://datos.gob.es/catalogo/l01281317-ofertas-de-empleo-publico-y-convocatorias-del-ayuntamiento",
+        "title": "Ofertas de empleo público y convocatorias del Ayuntamiento",
+        "description": "Relación de ofertas de empleo público y convocatorias realizadas por el Ayuntamiento de San Lorenzo de El Escorial. ",
+        "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/L01281317",
+        "issued": "mié, 07 ene 2026 13:52:44 GMT+0000",
+        "modified": "jue, 05 feb 2026 16:39:00 GMT+0000",
+        "license": "http://creativecommons.org/licenses/by/4.0/",
+        "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Provincia/Madrid",
+        "temporal": [
+          "https://datosabiertos.aytosanlorenzo.es/bnode/N23c65ed7d2bb48c48e72ed312d6b123e",
+          "https://datosabiertos.aytosanlorenzo.es/bnode/N890efdf1ca9f4b1f9041c260d5423114"
+        ],
+        "distributions": [
+          {
+            "title": "Ofertas de empleo público y convocatorias",
+            "format": "http://publications.europa.eu/resource/authority/file-type/XLSX",
+            "access_url": "https://datosabiertos.aytosanlorenzo.es/dataset/6fa4dd2c-ea5e-4f9a-ae22-4519369948f7/resource/f7b1b1e0-7081-4b44-92d8-ea888c5bce64/download/31.-oferta-de-empleo-publico-y-convocatorias.xlsx",
+            "download_url": null,
+            "license": null,
+            "byte_size": 7966
+          },
+          {
+            "title": "Oferta de Empleo Público y Convocatorias",
+            "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+            "access_url": "https://datosabiertos.aytosanlorenzo.es/dataset/6fa4dd2c-ea5e-4f9a-ae22-4519369948f7/resource/fdc2e198-af12-4363-8fc2-d0a0d08c1d83/download/31.-oferta-de-empleo-publico-y-convocatorias.csv",
+            "download_url": null,
+            "license": null,
+            "byte_size": 953
+          }
+        ]
+      },
+      {
+        "dataset_id": "l01280796-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo",
+        "catalog_url": "https://datos.gob.es/catalogo/l01280796-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo",
+        "title": "Estudio de satisfacción de las personas usuarias del Programa Camino al Empleo",
+        "description": "El Ayuntamiento de Madrid, a través de la Agencia para el Empleo, ha puesto en marcha el programa Camino al Empleo, orientado a mejorar la empleabilidad de las personas en situación de vulnerabilidad mediante el desarrollo de competencias básicas y específicas. La información analizada procede de la encuesta de satisfacción dirigida a las personas participantes del programa en distintas ubicaciones de la red de centros de servicios sociales y de la Agencia para el Empleo de Madrid.<br>\n<br>\nLa unidad de análisis corresponde a cada participante, incorporando variables relativas a la fecha y lugar de desarrollo de la actuación, así como la valoración del trato recibido y de la información facilitada. Durante el primer trimestre no se dispone de información sobre la variable “ubicación”, al no haberse contemplado en el diseño inicial del instrumento de recogida. Asimismo, se incluyen variables sociodemográficas (sexo y tramo de edad), y las valoraciones se expresan en una escala de 1 a 10, representativa del nivel de satisfacción global con el programa en 2025.\n****\n<br>\n<br>\nEn el [banco de estudios del Ayuntamiento de Madrid](https://transparencia.madrid.es/portales/transparencia/es/Relacion-con-la-ciudadania/Percepcion-ciudadana/Banco-de-estudios/?vgnextfmt=default&vgnextchannel=6d41b8663351c510VgnVCM1000001d4a900aRCRD) están disponibles los estudios de percepción ciudadana realizados o promovidos por las distintas unidades del Ayuntamiento, organizados por áreas de acción.\n",
+        "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/L01280796",
+        "issued": "mar, 09 jun 2026 00:00:00 GMT+0000",
+        "modified": "mar, 28 jul 2026 00:00:00 GMT+0000",
+        "license": "https://datos.madrid.es/bnode/N136f9d4e1508493ab5304251a6521b07",
+        "spatial": "http://sws.geonames.org/3117735/",
+        "temporal": "https://datos.madrid.es/bnode/N6545e26dc04d411eac7852fd9539868a",
+        "distributions": [
+          {
+            "title": "138105-0-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo",
+            "format": "http://publications.europa.eu/resource/authority/file-type/XLSX",
+            "access_url": "https://datos.madrid.es/dataset/138105-0-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo/resource/138105-0-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo/download/microdatos_2025_090_esu.xlsx",
+            "download_url": null,
+            "license": null,
+            "byte_size": "41836"
+          }
+        ]
+      },
+      {
+        "dataset_id": "l01082114-subvenciones-concedidas-para-el-fomento-del-empleo",
+        "catalog_url": "https://datos.gob.es/catalogo/l01082114-subvenciones-concedidas-para-el-fomento-del-empleo",
+        "title": "Subvenciones concedidas para el fomento del empleo",
+        "description": "Subvenciones concedidas por el Ayuntamiento de Sant Feliu de Llobregat para el fomento del empleo.",
+        "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/L01082114",
+        "issued": "vie, 16 oct 2026",
+        "modified": "vie, 16 oct 2026",
+        "license": null,
+        "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Autonomia/Cataluna",
+        "temporal": "http://seu-e.cat/es/web/sant-feliu-de-llobregat/bnode/nc3413d09f61043a49c384a0ebd459861b5",
+        "distributions": [
+          {
+            "title": "Subvenciones para el fomento del empleo en el año 2022",
+            "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+            "access_url": "https://dadesobertes.seu-e.cat/dataset/sant-feliu-de-llobregat-subvencions-concedides-per-al-foment-de-l-ocupacio/resource/8232882b-bdcb-4854-95a9-c1d61b0f0fe4",
+            "download_url": "https://dadesobertes.seu-e.cat/datastore/dump/8232882b-bdcb-4854-95a9-c1d61b0f0fe4",
+            "license": null,
+            "byte_size": null
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3",
+        "retrieved_at": "2026-10-20T16:19:44.906859+00:00",
+        "sha256": "53752ffffe2e271e2a8df1ee18fc52f41ccaf03d1c1791b4900c0b02be6a06f3",
+        "cache_hit": false
+      }
+    ],
+    "coverage": {
+      "page": 0,
+      "page_size": 3,
+      "next_page": 1
+    },
+    "warnings": [
+      "Catalog metadata may be stale. Verify the original publisher, download availability, dataset-specific reuse licence, schema, units and update date before using data. No downstream distribution URL is fetched automatically."
+    ],
+    "notice": "Independent software by Sami Halawa; not an official government service. Verify consequential decisions in the official source."
+  }
+}

@@ -1,8 +1,8 @@
 {
   "name": "spain-open-data",
   "displayName": "Spain Open Data",
-  "version": "0.1.2",
-  "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
+  "version": "0.2.0",
+  "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
   "author": {
     "name": "Sami Halawa",
     "email": "sami@samihalawa.com"
@@ -10,8 +10,11 @@
   "license": "MIT",
   "keywords": [
     "spain",
-    "official-data",
-    "read-only"
+    "datos-abiertos",
+    "datos-gob-es",
+    "datasets",
+    "open-data",
+    "data-discovery"
   ],
   "homepage": "https://github.com/samihalawa/spain-open-data/blob/main/README.md",
   "repository": "https://github.com/samihalawa/spain-open-data",

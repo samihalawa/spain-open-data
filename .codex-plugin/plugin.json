@@ -3,29 +3,37 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
+  "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
   "interface": {
     "capabilities": [],
     "category": "Productivity",
     "composerIcon": "./assets/icon.png",
     "defaultPrompt": [
-      "Find Spanish employment datasets with reusable formats and clear licences.",
-      "Check whether this public dataset is suitable for my analysis."
+      "Busca datasets de empleo y compáralos por formato, licencia y fecha.",
+      "Encuentra datos de mi municipio y distingue catálogo, descarga e inspección real.",
+      "Muéstrame un ejemplo y qué comprobar antes de reutilizar los datos."
     ],
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/icon.png",
-    "longDescription": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.\n\nIncludes a focused assistant workflow, official-source references, review examples and a Python 3.11+ read-only adapter. In ChatGPT, uses available native browsing/file tools; in Claude Code or Codex, the bundled scripts can retrieve official data directly when networking is permitted. No separate account, API key or publisher-hosted server is required for this skills release.\n\nNo bulk mirroring, private-network fetches, indiscriminate crawling, downloaded-file execution, universal licence claim or invented dataset completeness.\n\nIndependent software by Sami Halawa. Not affiliated with Spanish public authorities.",
-    "shortDescription": "Find Spanish public datasets"
+    "longDescription": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.\n\nDesarrolladores y equipos que buscan datos públicos reutilizables. Identificador del dataset reutilizable en la siguiente consulta. Publicador, formatos y licencia en una ficha comparable. Metadatos encontrados separados de un fichero realmente inspeccionado.\n\nEjemplos guardados sin conexión e informes HTML/Markdown/JSON. Sin cuenta adicional, claves API ni servicio propio. Los scripts requieren Python 3.11+ y red autorizada. En ChatGPT, se utilizan únicamente las herramientas nativas disponibles.\n\nNo descarga automáticamente distribuciones externas ni ejecuta archivos. No garantiza licencias o descargas vigentes. La fecha del catálogo no equivale al periodo del dato.",
+    "shortDescription": "Datasets listos para evaluar",
+    "websiteURL": "https://github.com/samihalawa/spain-open-data/blob/main/README.md",
+    "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
+    "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
   },
   "keywords": [
     "spain",
-    "official-data",
-    "read-only",
-    "spain-open-data"
+    "claude-plugin",
+    "datos-abiertos",
+    "datos-gob-es",
+    "datasets",
+    "open-data",
+    "data-discovery"
   ],
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.1.2"
+  "version": "0.2.0"
 }

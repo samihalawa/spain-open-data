@@ -5,15 +5,15 @@
     "email": "sami@samihalawa.com"
   },
   "metadata": {
-    "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
-    "version": "0.1.2"
+    "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
-      "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
-      "version": "0.1.2"
+      "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
+      "version": "0.2.0"
     }
   ]
 }

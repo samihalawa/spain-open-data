@@ -1,0 +1,60 @@
+{
+  "version": "0.2.0",
+  "checked_at": "2026-10-20T16:26:31.017217+00:00",
+  "browser": "155.0.8059.85",
+  "scope": "Isolated headless Chrome over localhost; two viewport sizes, product page and saved report, local assets and clipboard stub. External links were not followed.",
+  "checks": [
+    {
+      "view": "desktop",
+      "page": "index.html",
+      "viewport": [
+        1280,
+        900
+      ],
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "javascript_errors": [],
+      "copy_buttons_tested": 4,
+      "status": "passed"
+    },
+    {
+      "view": "desktop",
+      "page": "demo.html",
+      "viewport": [
+        1280,
+        900
+      ],
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "javascript_errors": [],
+      "copy_buttons_tested": 0,
+      "status": "passed"
+    },
+    {
+      "view": "mobile",
+      "page": "index.html",
+      "viewport": [
+        390,
+        844
+      ],
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "javascript_errors": [],
+      "copy_buttons_tested": 4,
+      "status": "passed"
+    },
+    {
+      "view": "mobile",
+      "page": "demo.html",
+      "viewport": [
+        390,
+        844
+      ],
+      "http_status": 200,
+      "horizontal_overflow": false,
+      "javascript_errors": [],
+      "copy_buttons_tested": 0,
+      "status": "passed"
+    }
+  ]
+}
