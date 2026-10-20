@@ -1,0 +1,19 @@
+{
+  "name": "spain-open-data",
+  "owner": {
+    "name": "Sami Halawa",
+    "email": "sami@samihalawa.com"
+  },
+  "metadata": {
+    "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
+    "version": "0.1.2"
+  },
+  "plugins": [
+    {
+      "name": "spain-open-data",
+      "source": "./",
+      "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
+      "version": "0.1.2"
+    }
+  ]
+}

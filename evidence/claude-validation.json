@@ -1,0 +1,16 @@
+{
+  "version": "2.1.304",
+  "checked_at": "2026-10-20T15:41:36.164164+00:00",
+  "checks": [
+    {
+      "target": ".claude-plugin/plugin.json",
+      "exit_code": 0,
+      "output": "Validating plugin manifest: /Users/samihalawa/repos/spain-standalone-public/spain-open-data/.claude-plugin/plugin.json\n\n✔ Validation passed\n"
+    },
+    {
+      "target": ".",
+      "exit_code": 0,
+      "output": "Validating marketplace manifest: /Users/samihalawa/repos/spain-standalone-public/spain-open-data/.claude-plugin/marketplace.json\n\n✔ Validation passed\n"
+    }
+  ]
+}

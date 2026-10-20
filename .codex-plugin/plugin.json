@@ -1,0 +1,31 @@
+{
+  "author": {
+    "email": "sami@samihalawa.com",
+    "name": "Sami Halawa"
+  },
+  "description": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.",
+  "interface": {
+    "capabilities": [],
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.png",
+    "defaultPrompt": [
+      "Find Spanish employment datasets with reusable formats and clear licences.",
+      "Check whether this public dataset is suitable for my analysis."
+    ],
+    "developerName": "Sami Halawa",
+    "displayName": "Spain Open Data",
+    "logo": "./assets/icon.png",
+    "longDescription": "Find a reusable Spanish public dataset and explain its publisher, licence, freshness and practical download options.\n\nIncludes a focused assistant workflow, official-source references, review examples and a Python 3.11+ read-only adapter. In ChatGPT, uses available native browsing/file tools; in Claude Code or Codex, the bundled scripts can retrieve official data directly when networking is permitted. No separate account, API key or publisher-hosted server is required for this skills release.\n\nNo bulk mirroring, private-network fetches, indiscriminate crawling, downloaded-file execution, universal licence claim or invented dataset completeness.\n\nIndependent software by Sami Halawa. Not affiliated with Spanish public authorities.",
+    "shortDescription": "Find Spanish public datasets"
+  },
+  "keywords": [
+    "spain",
+    "official-data",
+    "read-only",
+    "spain-open-data"
+  ],
+  "license": "MIT",
+  "name": "spain-open-data",
+  "skills": "./skills",
+  "version": "0.1.2"
+}

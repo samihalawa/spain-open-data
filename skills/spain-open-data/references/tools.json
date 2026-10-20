@@ -1,0 +1,12 @@
+[
+  {
+    "name": "open_data_search",
+    "signature": "(query: 'str', page: 'int' = 0, page_size: 'int' = 10) -> 'dict[str, Any]'",
+    "description": "Search titles in the official datos.gob.es metadata catalog. Returns original publishers and distribution links; it does not ingest third-party datasets."
+  },
+  {
+    "name": "open_data_dataset",
+    "signature": "(dataset_id: 'str') -> 'dict[str, Any]'",
+    "description": "Read one datos.gob.es dataset metadata record by its catalog slug, preserving licence and download references."
+  }
+]
