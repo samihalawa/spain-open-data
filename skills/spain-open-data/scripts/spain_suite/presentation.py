@@ -101,8 +101,11 @@ def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str
         if tool=='boe_compare' and ok:parts.append('<h2>Diferencia textual</h2><pre>'+html.escape(result['data'].get('unified_diff') or 'Sin cambios textuales en el bloque y fechas comparados.')+'</pre>')
         parts.append('<h2>Fuentes que puedes comprobar</h2>')
         for source in sources:
+            partial_source=source.get('complete') is False
+            hash_label='SHA-256 del prefijo' if partial_source else 'SHA-256'
+            source_scope=(' · Respuesta incompleta: '+str(source.get('bytes_retained','?'))+' bytes conservados') if partial_source else ''
             url=safe_link(source.get('url'));link='<a href="'+html.escape(url,quote=True)+'" rel="noreferrer noopener">'+html.escape(url)+'</a>' if url else html.escape(value(source.get('url')))
-            parts.append('<div class="source">'+link+'<br><small>Consulta: '+html.escape(value(source.get('retrieved_at')))+' · SHA-256: '+html.escape(value(source.get('sha256'))[:16])+'…</small></div>')
+            parts.append('<div class="source">'+link+'<br><small>Consulta: '+html.escape(value(source.get('retrieved_at')))+' · '+hash_label+': '+html.escape(value(source.get('sha256'))[:16])+'…'+html.escape(source_scope)+'</small></div>')
         parts.append('<h2>Alcance de esta consulta</h2><pre>'+html.escape(json.dumps(result.get('coverage',{}),ensure_ascii=False,indent=2))+'</pre>')
         if result.get('warnings'):parts.append('<details open><summary>Antes de tomar una decisión</summary>'+''.join('<p>'+html.escape(str(w))+'</p>' for w in result['warnings'])+'</details>')
         if result.get('errors'):parts.append('<pre class="error">'+html.escape(json.dumps(result['errors'],ensure_ascii=False,indent=2))+'</pre>')
@@ -116,7 +119,7 @@ def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str
     if not ok:parts+=['Error: '+value(result.get('error'))]
     if tool=='boe_compare' and ok:parts+=['','## Diferencia textual','', '    '+(result['data'].get('unified_diff') or 'Sin cambios textuales en el bloque y fechas comparados.').replace('\n','\n    ')]
     parts+=['','## Fuentes','']
-    for source in sources:parts+=['- '+cell(source.get('url'),'markdown')+' · Consulta: '+value(source.get('retrieved_at'))]
+    for source in sources:parts+=['- '+cell(source.get('url'),'markdown')+' · Consulta: '+value(source.get('retrieved_at'))+(' · Solo prefijo de respuesta: incompleta' if source.get('complete') is False else '')]
     parts+=['','## Alcance','', '    '+json.dumps(result.get('coverage',{}),ensure_ascii=False,indent=2).replace('\n','\n    ') ]
     parts+=['','## Límites y comprobaciones','']+[ '- '+html.escape(str(w)) for w in result.get('warnings',[]) ]
     parts+=['','Software independiente de Sami Halawa. Conserva el JSON para inspeccionar todos los campos y textos completos.']

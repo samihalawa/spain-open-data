@@ -95,9 +95,13 @@ class Fetch:
     fetched_at: str
     content_type: str
     cached: bool = False
+    complete: bool = True
 
     def provenance(self) -> dict[str, Any]:
-        return {"url": self.url, "retrieved_at": self.fetched_at, "sha256": hashlib.sha256(self.body).hexdigest(), "cache_hit": self.cached}
+        record = {"url": self.url, "retrieved_at": self.fetched_at, "sha256": hashlib.sha256(self.body).hexdigest(), "cache_hit": self.cached}
+        if not self.complete:
+            record.update(complete=False, sha256_scope="response_prefix", bytes_retained=len(self.body), byte_limit=MAX_BYTES)
+        return record
 
     def json(self) -> Any:
         try:
@@ -109,10 +113,39 @@ class Fetch:
         # Reject DTD/entity declarations before using the standard-library XML parser.
         if re.search(br"<!\s*(DOCTYPE|ENTITY)\b", self.body.replace(b"\x00", b""), re.I):
             raise SourceError("unsafe_xml", "DTD/entity declarations are not accepted.", self.url)
+        if not self.complete:
+            return _atom_prefix(self.body, self.url)
         try:
             return ET.fromstring(self.body)
         except ET.ParseError as exc:
             raise SourceError("invalid_response", "The source did not return valid XML.", self.url) from exc
+
+
+def _atom_prefix(body: bytes, url: str) -> ET.Element:
+    """Retain only completed direct children; never claim a clipped document is complete."""
+    _feed_url(url)
+    parser = ET.XMLPullParser(events=("start", "end"))
+    root = None
+    depth = 0
+    try:
+        parser.feed(body)
+        for event, node in parser.read_events():
+            if event == "start":
+                depth += 1
+                if depth == 1:
+                    if node.tag != "{http://www.w3.org/2005/Atom}feed":
+                        raise SourceError("schema_changed", "Expected an official Atom feed.", url)
+                    root = ET.Element(node.tag, node.attrib)
+            else:
+                if depth == 2 and root is not None:
+                    root.append(node)
+                depth -= 1
+        # Do not close the parser: EOF is deliberately not asserted for a prefix.
+    except ET.ParseError as exc:
+        raise SourceError("invalid_response", "The retained Atom prefix contains malformed XML.", url) from exc
+    if root is None or not any(node.tag == "{http://www.w3.org/2005/Atom}entry" for node in root):
+        raise SourceError("response_too_large", "No complete Atom entry fits inside the bounded response window (at most 8 MiB); no tender results were inferred.", url)
+    return root
 
 
 class OfficialClient:
@@ -124,16 +157,20 @@ class OfficialClient:
         self.last_request: dict[str, float] = {}
         self.opener = urllib.request.build_opener(_SafeRedirect())
 
-    def get(self, url: str, params: dict[str, Any] | None = None, accept: str = "application/json") -> Fetch:
+    def get(self, url: str, params: dict[str, Any] | None = None, accept: str = "application/json", *, allow_atom_prefix: bool = False) -> Fetch:
         if params:
             url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params)
         safe_url(url)
-        key = accept + " " + url
+        if allow_atom_prefix:
+            _feed_url(url)
+            if accept != "application/atom+xml":
+                raise SourceError("invalid_input", "Bounded prefixes are supported only for the official PLACSP Atom feed.")
+        key = accept + " " + url + (" prefix" if allow_atom_prefix else "")
         with self.lock:
             cached = self.cache.get(key)
             if cached and time.monotonic() - cached[0] < self.ttl:
                 f = cached[1]
-                return Fetch(f.body, f.url, f.fetched_at, f.content_type, True)
+                return Fetch(f.body, f.url, f.fetched_at, f.content_type, True, complete=f.complete)
             host = urllib.parse.urlsplit(url).hostname or ""
             wait = max(0.0, self.last_request.get(host, 0.0) + .25 - time.monotonic())
             self.last_request[host] = time.monotonic() + wait
@@ -144,16 +181,24 @@ class OfficialClient:
             try:
                 with self.opener.open(req, timeout=20) as response:
                     safe_url(response.geturl())
-                    chunks, total = [], 0
+                    chunks, total, complete = [], 0, True
+                    # PLACSP pages are large: use a smaller latency-bounded window
+                    # for interactive reads, under the unchanged global 8 MiB cap.
+                    read_limit = min(MAX_BYTES, 1024 * 1024) if allow_atom_prefix else MAX_BYTES
                     while True:
-                        part = response.read(65536)
+                        # One lookahead byte detects overflow; retained/parsing bytes stay capped.
+                        part = response.read(min(65536, read_limit - total + 1))
                         if not part:
                             break
                         total += len(part)
-                        if total > MAX_BYTES:
-                            raise SourceError("response_too_large", "Official response exceeds the 8 MiB safety limit; narrow the query.", url)
+                        if total > read_limit:
+                            if not allow_atom_prefix:
+                                raise SourceError("response_too_large", "Official response exceeds the 8 MiB safety limit; narrow the query.", url)
+                            chunks.append(part[:len(part) - (total - read_limit)])
+                            complete = False
+                            break
                         chunks.append(part)
-                    f = Fetch(b"".join(chunks), response.geturl(), dt.datetime.now(dt.timezone.utc).isoformat(), response.headers.get("Content-Type", ""))
+                    f = Fetch(b"".join(chunks), response.geturl(), dt.datetime.now(dt.timezone.utc).isoformat(), response.headers.get("Content-Type", ""), complete=complete)
                 with self.lock:
                     self.cache[key] = (time.monotonic(), f)
                     self.cache.move_to_end(key)
@@ -272,18 +317,19 @@ def _feed_url(url: str) -> str:
 
 
 def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 20, cursor: str = "", offset: int = 0, deadline_from: str = "") -> dict[str, Any]:
-    """Search a bounded PLACSP feed window with lossless within-page continuation. Optional deadline_from filters dates, not legal application status."""
+    """Search a bounded PLACSP window. Oversized pages expose complete prefix entries with explicit partial coverage; continuation never skips an unread suffix. Optional deadline_from filters dates, not legal application status."""
     query=text_input(query,"query");cpv_prefix=text_input(cpv_prefix,"cpv_prefix",8)
     if cpv_prefix and not re.fullmatch(r"\d{2,8}",cpv_prefix):raise SourceError("invalid_input","cpv_prefix must contain 2–8 digits.")
     integer(max_pages,"max_pages",1,3);integer(limit,"limit",1,50);integer(offset,"offset",0,100000)
     threshold=date_input(deadline_from) if deadline_from else None
     url=_feed_url(cursor or PLACSP);rows=[];sources=[];seen=set();deleted=set();visited=set();scanned=0;unknown_deadlines=0;errors=[]
     next_url=None;next_offset=None;stopped=False;offset_on_page=offset
+    prefix_pages=[];older_page_cursor=None;continuation_blocked_reason=None
     for _ in range(max_pages):
         if url in visited:raise SourceError("schema_changed","The source returned a cyclic continuation link.",url)
         visited.add(url)
         try:
-            f=CLIENT.get(_feed_url(url),accept="application/atom+xml");root=f.xml()
+            f=CLIENT.get(_feed_url(url),accept="application/atom+xml",allow_atom_prefix=True);root=f.xml()
             if root.tag!="{http://www.w3.org/2005/Atom}feed":raise SourceError("schema_changed","Expected an official Atom feed.",f.url)
         except SourceError as exc:
             if not sources:
@@ -292,6 +338,9 @@ def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, lim
                 raise
             errors.append({"code":exc.code,"message":str(exc),"source_url":exc.source_url});next_url=url;next_offset=offset_on_page;break
         sources.append(f)
+        if not f.complete:
+            prefix_pages.append(f.url)
+            errors.append({"code":"response_prefix_only","message":f"Only complete entries within the retained {len(f.body)}-byte prefix were parsed. The page suffix, later entries and tombstones were not examined.","source_url":f.url})
         deleted.update(e.attrib.get("ref","") for e in descendants(root,"deleted-entry"))
         entries=[e for e in root if local_name(e.tag)=="entry"]
         if offset_on_page>len(entries):raise SourceError("invalid_input","Offset exceeds this feed page; start again because the live feed may have changed.",f.url)
@@ -318,17 +367,29 @@ def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, lim
             hrefs=[e.attrib.get("href") for e in entry if local_name(e.tag)=="link" and e.attrib.get("rel","alternate")=="alternate"]
             rows.append({"id":eid,"title":title,"official_url":hrefs[0] if hrefs else eid,"updated":path_text(entry,"updated"),"reference":first_text(status,"ContractFolderID"),"status_code":first_text(status,"ContractFolderStatusCode"),"authority":first_text(parties[0],"Name") if parties else None,"cpv":cpvs,"budget_excluding_tax":first_text(budget[0],"TaxExclusiveAmount") if budget else None,"currency":next((e.attrib.get("currencyID") for e in budget[0] if local_name(e.tag)=="TaxExclusiveAmount"),None) if budget else None,"deadline_date":end,"deadline_time":first_text(deadlines[0],"EndTime") if deadlines else None,"deadline_assessment":assessment,"document_urls":list(dict.fromkeys(docs))})
         if stopped:break
+        if not f.complete:
+            candidate=next((e.attrib.get("href") for e in root if local_name(e.tag)=="link" and e.attrib.get("rel")=="next"),None)
+            older_page_cursor=_feed_url(candidate) if candidate else None
+            # Advancing to an older page would silently skip the unread suffix.
+            next_url=None;next_offset=None;continuation_blocked_reason="unread_page_suffix"
+            break
         next_url=next((e.attrib.get("href") for e in root if local_name(e.tag)=="link" and e.attrib.get("rel")=="next"),None)
         next_offset=0 if next_url else None
         if not next_url:break
         url=_feed_url(next_url);offset_on_page=0
     rows=[r for r in rows if r['id'] not in deleted]
     warnings=["Bounded feed window, not all Spanish tenders. A future deadline does not establish an open procedure; verify status, lots, amendments and the official profile.","Continuation preserves within-page matches. Live feed pages can change; deduplicate stable tender IDs across calls."]
+    if prefix_pages:
+        warnings.append("Partial source: only complete entries inside a bounded response prefix (at most 1 MiB for interactive reads, below the 8 MiB hard limit) were checked. Entries and cancellation tombstones outside it remain unexamined. A prefix SHA-256 does not identify the complete feed. Verify each contracting profile.")
+    if continuation_blocked_reason:
+        warnings.append("Lossless continuation is blocked at the unread page suffix. The separately reported older_page_cursor is an optional older window, not continuation past all entries in this page.")
     if threshold:warnings.append("deadline_from excludes missing/unparseable deadlines; these exclusions are counted separately.")
     next_args={"query":query,"cpv_prefix":cpv_prefix,"max_pages":max_pages,"limit":limit,"cursor":next_url,"offset":next_offset,"deadline_from":deadline_from} if next_url else None
-    result=envelope(rows,sources,warnings,pages_fetched=len(sources),entries_examined=scanned,returned=len(rows),result_limit_reached=stopped,next_cursor=next_url,next_offset=next_offset,next_request=next_args,unknown_deadlines_excluded=unknown_deadlines,deleted_ids_observed=len(deleted),partial=bool(errors),exhaustive=False)
+    result=envelope(rows,sources,warnings,pages_fetched=len(sources),entries_examined=scanned,returned=len(rows),result_limit_reached=stopped,next_cursor=next_url,next_offset=next_offset,next_request=next_args,unknown_deadlines_excluded=unknown_deadlines,deleted_ids_observed=len(deleted),partial=bool(errors),exhaustive=False,prefix_pages=prefix_pages,older_page_cursor=older_page_cursor,continuation_blocked_reason=continuation_blocked_reason)
     if errors:
-        result["errors"]=errors;result["warnings"].append("A later feed page could not be read. Earlier results are preserved; do not claim that the complete requested window was checked.")
+        result["errors"]=errors
+        if any(error["code"] != "response_prefix_only" for error in errors):
+            result["warnings"].append("A later feed page could not be read. Earlier results are preserved; do not claim that the complete requested window was checked.")
     return result
 
 
