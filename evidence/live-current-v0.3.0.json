@@ -1,0 +1,31 @@
+{
+  "version": "0.3.0",
+  "checked_at": "2026-10-23T08:51:59.983508+00:00",
+  "scope": "Current read-only requests using exact documented demo arguments. BOE/BORME dates are explicit historical query ranges. Does not validate production endpoint or infrastructure.",
+  "check": {
+    "slug": "spain-open-data",
+    "tool": "open_data_compare",
+    "arguments": {
+      "query": "empleo",
+      "page_size": 3
+    },
+    "ok": true,
+    "sources": [
+      {
+        "url": "https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3",
+        "retrieved_at": "2026-10-23T08:51:25.688188+00:00",
+        "sha256": "53752ffffe2e271e2a8df1ee18fc52f41ccaf03d1c1791b4900c0b02be6a06f3",
+        "cache_hit": false
+      }
+    ],
+    "coverage": {
+      "page": 0,
+      "page_size": 3,
+      "next_page": 1,
+      "compared": 3,
+      "only_catalog_metadata": true
+    },
+    "error": null,
+    "duration_seconds": 1.76
+  }
+}

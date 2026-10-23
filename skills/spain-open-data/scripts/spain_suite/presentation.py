@@ -46,6 +46,13 @@ def observation_date(v: Any) -> str:
 
 
 def table_view(result: dict, tool: str):
+    if tool=='catastro_ficha':result={**result,'data':result.get('data',{}).get('property',{})};tool='catastro_property'
+    if tool=='ine_series_change':
+        d=result.get('data',{});return ['Indicador','Valor'],[['Serie',d.get('series_name')],['Periodo anterior',d.get('older_period')],['Valor anterior',d.get('older_value')],['Periodo posterior',d.get('newer_period')],['Valor posterior',d.get('newer_value')],['Cambio absoluto',d.get('absolute_change')],['Cambio porcentual',d.get('percentage_change')],['Unidad',d.get('unit')]]
+    if tool=='boe_find_articles':
+        return ['Bloque','Título','Versión seleccionada','Extracto'],[[x.get('block_id'),x.get('title'),x.get('selected_version'),x.get('excerpt')] for x in result.get('data',[])]
+    aliases={'licita_triage':'licita_search','ayudas_opportunities':'ayudas_shortlist','borme_events':'borme_company_range','open_data_compare':'open_data_search'}
+    tool=aliases.get(tool,tool)
     data=result.get('data');rows=data if isinstance(data,list) else [data] if isinstance(data,dict) else []
     if tool=='licita_search':
         cols=['Expediente','Licitación','Organismo','Presupuesto sin IVA','Cierre publicado','Lectura del plazo','Enlace']

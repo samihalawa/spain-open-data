@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 MADRID = ZoneInfo("Europe/Madrid")
 BOE = "https://www.boe.es"
 BDNS = "https://www.infosubvenciones.es/bdnstrans/api"
@@ -286,7 +286,10 @@ def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, lim
             f=CLIENT.get(_feed_url(url),accept="application/atom+xml");root=f.xml()
             if root.tag!="{http://www.w3.org/2005/Atom}feed":raise SourceError("schema_changed","Expected an official Atom feed.",f.url)
         except SourceError as exc:
-            if not sources:raise
+            if not sources:
+                if exc.code == "response_too_large":
+                    raise SourceError("response_too_large", "The official PLACSP Atom page exceeds the 8 MiB read limit. Query, limit and max_pages filter after retrieval and cannot reduce this upstream page. No tender results were inferred.", exc.source_url) from exc
+                raise
             errors.append({"code":exc.code,"message":str(exc),"source_url":exc.source_url});next_url=url;next_offset=offset_on_page;break
         sources.append(f)
         deleted.update(e.attrib.get("ref","") for e in descendants(root,"deleted-entry"))
@@ -655,14 +658,125 @@ def borme_company_range(company: str, start_date: str, end_date: str, province: 
     return out
 
 
+def licita_triage(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 15, cursor: str = "", offset: int = 0, deadline_from: str = "") -> dict[str, Any]:
+    """Fast triage of one bounded official PLACSP feed window. A date bucket is not a bid/no-bid determination."""
+    base=licita_search(query=query,cpv_prefix=cpv_prefix,max_pages=max_pages,limit=limit,cursor=cursor,offset=offset,deadline_from=deadline_from)
+    rows=[];counts={}
+    for item in base['data']:
+        flag=item.get('deadline_assessment',{}).get('date_state','deadline_not_established')
+        if flag in ('past_end_date',):bucket='published_deadline_passed'
+        elif flag in ('within_published_dates','ends_today_check_time','end_date_ahead_start_unverified'):bucket='published_deadline_requires_verification'
+        else:bucket='deadline_or_status_unknown'
+        counts[bucket]=counts.get(bucket,0)+1
+        rows.append({**item,'review_bucket':bucket,'next_action':'Check the current official contracting profile, all lots, PCAP/PPT, corrections and procedure status before deciding whether to bid.'})
+    out={**base,'data':rows,'coverage':{**base['coverage'],'buckets_in_returned_rows':counts},'warnings':base.get('warnings',[])+['These are date-based and unknown-status triage buckets, not confirmation that a call is open, that you qualify or that any filing was submitted.']}
+    return out
+
+
+def ayudas_opportunities(query: str, page: int = 0, limit: int = 5, as_of: str = "") -> dict[str, Any]:
+    """Actionability triage of up to five BDNS records based on published fields; no invented eligibility or grant approval."""
+    base=ayudas_shortlist(query,page,limit,as_of)
+    categories={'review_dates_and_bases':0,'possible_direct_award':0,'published_deadline_passed':0,'details_unavailable':0}
+    ranked=[]
+    for row in base['data']:
+        state=(row.get('deadline_assessment') or {}).get('date_state','deadline_not_established')
+        if row.get('detail_error'):category='details_unavailable'
+        elif row.get('direct_award_signal'):category='possible_direct_award'
+        elif state=='past_end_date':category='published_deadline_passed'
+        else:category='review_dates_and_bases'
+        categories[category]+=1
+        ranked.append({**row,'review_bucket':category,'next_action':'Read the complete bases, eligible beneficiaries, later amendments and actual submission portal.'})
+    ordered={'review_dates_and_bases':0,'details_unavailable':1,'possible_direct_award':2,'published_deadline_passed':3}
+    ranked.sort(key=lambda x:(ordered[x['review_bucket']],str((x.get('deadline_assessment') or {}).get('end_date') or '9999')))
+    return {**base,'data':ranked,'coverage':{**base['coverage'],'buckets_in_returned_rows':categories},'warnings':base.get('warnings',[])+['Triage order is a review order only, not a recommendation that an applicant qualifies.']}
+
+
+def boe_find_articles(law_id: str, query: str, as_of: str = "", offset: int = 0, limit: int = 10, search_text: bool = False) -> dict[str, Any]:
+    """Locate block IDs by article title (and optionally text) before version comparison. Searches one named consolidated law."""
+    q=text_input(query,'query',120,False);integer(offset,'offset',0,100000);integer(limit,'limit',1,30)
+    if not isinstance(search_text,bool):raise SourceError('invalid_input','search_text must be true or false.')
+    day=date_input(as_of);f,blocks=_law(law_id);terms=fold(q).split();matches=[]
+    for block in blocks:
+        title=block.get('titulo') or '';selected=_version(block,day);body=inner_text(selected) if selected is not None else ''
+        haystack=fold(title+' '+body) if search_text else fold(title)
+        if all(term in haystack for term in terms):
+            matches.append({'block_id':block.get('id'),'title':title,'type':block.get('tipo'),'selected_version':dict(selected.attrib) if selected is not None else None,'excerpt':body[:450] if selected is not None else None,'text_searched':search_text})
+    return envelope(matches[offset:offset+limit],[f],['Search covers only this law and the selected date. A matched article is not a finding of legal applicability. Use boe_compare with its returned block_id and explicit dates.'],law_id=law_id,query=q,as_of=day.isoformat(),matches=len(matches),returned=len(matches[offset:offset+limit]),next_offset=offset+limit if offset+limit<len(matches) else None,search_text=search_text)
+
+
+_BORME_EVENTS=(('incorporation',r'\bconstitucion\b'),('dissolution',r'\bdisolucion\b'),('registered_office_change',r'\bcambio de domicilio\b'),('appointment',r'\bnombramientos?\b'),('resignation',r'\bceses?\b|\bdimisiones?\b'),('capital_increase',r'\bampliacion de capital\b'),('capital_reduction',r'\breduccion de capital\b'),('correction',r'\bfe de erratas\b|\brectificacion\b'),('insolvency_proceeding',r'\bconcurso\b'))
+
+
+def borme_events(company: str, start_date: str, end_date: str, province: str = 'MADRID', limit: int = 20) -> dict[str, Any]:
+    """Classify dated BORME company notices conservatively using visible keyword rules; no credit/fraud predictions."""
+    base=borme_company_range(company,start_date,end_date,province,limit)
+    rows=[];counts={}
+    for row in base['data']:
+        body=fold(row.get('text') or '')
+        categories=[key for key,pattern in _BORME_EVENTS if re.search(pattern,body)] or ['unclassified']
+        for key in categories:counts[key]=counts.get(key,0)+1
+        rows.append({**row,'event_categories':categories,'classification':'keyword_heuristic_not_certified'})
+    return {**base,'data':rows,'coverage':{**base['coverage'],'event_category_counts_in_returned_rows':counts},'warnings':base.get('warnings',[])+['Event categories are deterministic keyword signals applied to the preserved official notice text, not certified company status, economic risk or beneficial ownership.']}
+
+
+def catastro_ficha(reference: str) -> dict[str, Any]:
+    """One-call public cadastral description and coordinate reference point with visible partial failures."""
+    property_result=catastro_property(reference)
+    errors=[];coordinate=None;source_records=property_result['sources'][:]
+    try:
+        position=catastro_coordinates(reference);source_records.extend(position['sources']);coordinate=position['data']
+    except SourceError as exc:
+        errors.append({'component':'coordinates','code':exc.code,'message':str(exc),'source_url':exc.source_url})
+    out={'ok':True,'data':{'property':property_result['data'],'coordinates':coordinate,'title_verified':False,'planning_verified':False},'sources':source_records,'coverage':{'reference':reference,'description_checked':True,'coordinate_checked':coordinate is not None,'partial':bool(errors)},'warnings':property_result['warnings']+['A reference point is not a surveyed boundary. A cadastral description is not evidence of ownership, legal occupation, or planning permission.'],'notice':SOURCE_NOTICE}
+    if errors:out['errors']=errors
+    return out
+
+
+def ine_series_change(series_code: str, last: int = 12) -> dict[str, Any]:
+    """Compare the last two non-confidential numerical observations in an INE series, without inventing frequency or annualised growth."""
+    base=ine_series(series_code,last);body=base['data'];entries=[]
+    for r in as_list(body.get('Data')):
+        if not isinstance(r,dict) or r.get('Secreto') is True:continue
+        v=r.get('Valor')
+        if not isinstance(v,(int,float)) or isinstance(v,bool) or not math.isfinite(v):continue
+        when=r.get('Fecha')
+        try:
+            if isinstance(when,(int,float)) and not isinstance(when,bool):day=dt.datetime.fromtimestamp(when/1000,MADRID).date()
+            elif isinstance(when,str):
+                stamp=dt.datetime.fromisoformat(when.replace('Z','+00:00'));day=stamp.astimezone(MADRID).date() if stamp.tzinfo else stamp.date()
+            else:continue
+        except (OverflowError,ValueError,OSError):continue
+        entries.append((day,v,r))
+    entries.sort(key=lambda x:x[0]);uniq={x[0]:x for x in entries};values=list(uniq.values())
+    if len(values)<2:raise SourceError('insufficient_observations','Fewer than two comparable non-confidential numeric observations were returned. No change was inferred.')
+    (older_date,older,older_raw),(newer_date,newer,newer_raw)=values[-2:]
+    delta=newer-older;percent=(delta/older*100) if older!=0 else None
+    return {**base,'data':{'series_code':series_code,'series_name':body.get('Nombre'),'unit':body.get('T3_Unidad',body.get('FK_Unidad')),'scale':body.get('T3_Escala',body.get('FK_Escala')),'older_period':older_date.isoformat(),'newer_period':newer_date.isoformat(),'older_value':older,'newer_value':newer,'absolute_change':delta,'percentage_change':percent,'percentage_change_unavailable_reason':'zero_baseline' if older==0 else None,'older_record':older_raw,'newer_record':newer_raw},'coverage':{**base['coverage'],'observations_requested':last,'non_confidential_numeric_periods':len(values)},'warnings':base.get('warnings',[])+['This is a two-observation arithmetic comparison, not an annualised rate or a statement about statistical significance. Check units, base, adjustments, provisional flags and comparability before interpreting it.']}
+
+
+def open_data_compare(query: str, page: int = 0, page_size: int = 8) -> dict[str, Any]:
+    """Compare dataset catalog metadata and verification gaps without fetching downstream files or certifying licences."""
+    base=open_data_search(query,page,page_size);rows=[]
+    for row in base['data']:
+        dist=as_list(row.get('distributions'))
+        formats=sorted({str(d.get('format')).rsplit('/',1)[-1] for d in dist if isinstance(d,dict) and d.get('format')})
+        links=[url for d in dist if isinstance(d,dict) for url in [d.get('download_url') or d.get('access_url')] if isinstance(url,str) and url.strip()]
+        declared=row.get('license')
+        gaps=[]
+        if not declared:gaps.append('licence_not_declared')
+        if not links:gaps.append('no_distribution_link')
+        if not row.get('modified'):gaps.append('catalog_update_date_missing')
+        rows.append({**row,'formats':formats,'distribution_count':len(dist),'declared_licence':declared,'catalog_metadata_gaps':gaps,'download_checked':False,'distribution_schema_checked':False,'reuse_rights_verified':False})
+    return {**base,'data':rows,'coverage':{**base['coverage'],'compared':len(rows),'only_catalog_metadata':True},'warnings':base.get('warnings',[])+['This comparison identifies metadata and missing checks, not working downloads, valid permission to reuse, observed data freshness or data quality.']}
+
 PRODUCT_TOOLS: dict[str,list[Callable[...,dict[str,Any]]]] = {
-    "licita-espana":[licita_search],
-    "ayudas-espana":[ayudas_search,ayudas_call,ayudas_shortlist],
-    "boe-impact":[boe_daily,boe_document,boe_consolidated,boe_compare],
-    "borme-intelligence":[borme_company_notices,borme_company_range],
-    "catastro-pro":[catastro_property,catastro_coordinates],
-    "ine-evidence":[ine_operations,ine_tables,ine_table_series,ine_series],
-    "spain-open-data":[open_data_search,open_data_dataset],
+    "licita-espana":[licita_search,licita_triage],
+    "ayudas-espana":[ayudas_search,ayudas_call,ayudas_shortlist,ayudas_opportunities],
+    "boe-impact":[boe_daily,boe_document,boe_consolidated,boe_compare,boe_find_articles],
+    "borme-intelligence":[borme_company_notices,borme_company_range,borme_events],
+    "catastro-pro":[catastro_property,catastro_coordinates,catastro_ficha],
+    "ine-evidence":[ine_operations,ine_tables,ine_table_series,ine_series,ine_series_change],
+    "spain-open-data":[open_data_search,open_data_dataset,open_data_compare],
 }
 TOOLS = {f.__name__:f for functions in PRODUCT_TOOLS.values() for f in functions}
 

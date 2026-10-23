@@ -8,5 +8,10 @@
     "name": "open_data_dataset",
     "signature": "(dataset_id: 'str') -> 'dict[str, Any]'",
     "description": "Read one datos.gob.es dataset metadata record by its catalog slug, preserving licence and download references."
+  },
+  {
+    "name": "open_data_compare",
+    "signature": "(query: 'str', page: 'int' = 0, page_size: 'int' = 8) -> 'dict[str, Any]'",
+    "description": "Compare dataset catalog metadata and verification gaps without fetching downstream files or certifying licences."
   }
 ]

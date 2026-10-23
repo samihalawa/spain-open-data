@@ -14,7 +14,7 @@ class CommandLine(unittest.TestCase):
     def test_list_is_product_scoped(self):
         r=self.call('list');self.assertEqual(r.returncode,0);self.assertEqual(set(json.loads(r.stdout)),{SLUG})
     def test_doctor_runs_offline(self):
-        r=self.call('doctor');self.assertEqual(r.returncode,0);d=json.loads(r.stdout);self.assertEqual(d['version'],'0.2.0');self.assertFalse(d['network_tested']);self.assertTrue(d['offline_demo_present'])
+        r=self.call('doctor');self.assertEqual(r.returncode,0);d=json.loads(r.stdout);self.assertEqual(d['version'],json.loads((ROOT/'plugin.json').read_text())['version']);self.assertFalse(d['network_tested']);self.assertTrue(d['offline_demo_present'])
     def test_demo_markdown_runs_offline(self):
         r=self.call('demo');self.assertEqual(r.returncode,0,r.stdout+r.stderr);self.assertIn('EJEMPLO GUARDADO',r.stdout)
     def test_demo_html_runs_offline(self):

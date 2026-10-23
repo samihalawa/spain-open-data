@@ -17,6 +17,14 @@ r=subprocess.run([sys.executable,str(skill/'scripts/run.py'),'list'],capture_out
 assert set(json.loads(r.stdout))=={slug}
 sys.path.insert(0,str(skill/'scripts'))
 from spain_suite import core
+assert core.VERSION == p['version'] == '0.3.0'
+assert json.loads((root/'.codex-plugin/plugin.json').read_text())['version'] == core.VERSION
+market=json.loads((root/'.claude-plugin/marketplace.json').read_text())
+assert market['metadata']['version'] == market['plugins'][0]['version'] == core.VERSION
+assert json.loads((skill/'references/product.json').read_text())['version'] == core.VERSION
+import inspect
+expected=[{'name': f.__name__, 'signature': str(inspect.signature(f)), 'description': f.__doc__} for f in core.PRODUCT_TOOLS[slug]]
+assert json.loads((skill/'references/tools.json').read_text()) == expected
 assert not core.call_tool('__unknown__',{})['ok']
 assert not core.call_tool('catastro_property',{'reference':'invalid'})['ok']
 assert not core.call_tool('open_data_dataset',{'dataset_id':'http://127.0.0.1/'})['ok']

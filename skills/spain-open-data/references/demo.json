@@ -1,10 +1,10 @@
 {
-  "tool": "open_data_search",
+  "tool": "open_data_compare",
   "arguments": {
     "query": "empleo",
     "page_size": 3
   },
-  "captured_at": "2026-10-20T16:20:04.937305+00:00",
+  "captured_at": "2026-10-20T16:59:24.559646+00:00",
   "note": "Saved public-source example, not a current query or user-owned record.",
   "result": {
     "ok": true,
@@ -40,7 +40,17 @@
             "license": null,
             "byte_size": 953
           }
-        ]
+        ],
+        "formats": [
+          "CSV",
+          "XLSX"
+        ],
+        "distribution_count": 2,
+        "declared_licence": "http://creativecommons.org/licenses/by/4.0/",
+        "catalog_metadata_gaps": [],
+        "download_checked": false,
+        "distribution_schema_checked": false,
+        "reuse_rights_verified": false
       },
       {
         "dataset_id": "l01280796-estudio-de-satisfaccion-de-las-personas-usuarias-del-programa-camino-al-empleo",
@@ -62,7 +72,16 @@
             "license": null,
             "byte_size": "41836"
           }
-        ]
+        ],
+        "formats": [
+          "XLSX"
+        ],
+        "distribution_count": 1,
+        "declared_licence": "https://datos.madrid.es/bnode/N136f9d4e1508493ab5304251a6521b07",
+        "catalog_metadata_gaps": [],
+        "download_checked": false,
+        "distribution_schema_checked": false,
+        "reuse_rights_verified": false
       },
       {
         "dataset_id": "l01082114-subvenciones-concedidas-para-el-fomento-del-empleo",
@@ -84,13 +103,24 @@
             "license": null,
             "byte_size": null
           }
-        ]
+        ],
+        "formats": [
+          "CSV"
+        ],
+        "distribution_count": 1,
+        "declared_licence": null,
+        "catalog_metadata_gaps": [
+          "licence_not_declared"
+        ],
+        "download_checked": false,
+        "distribution_schema_checked": false,
+        "reuse_rights_verified": false
       }
     ],
     "sources": [
       {
         "url": "https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3",
-        "retrieved_at": "2026-10-20T16:19:44.906859+00:00",
+        "retrieved_at": "2026-10-20T16:59:02.448773+00:00",
         "sha256": "53752ffffe2e271e2a8df1ee18fc52f41ccaf03d1c1791b4900c0b02be6a06f3",
         "cache_hit": false
       }
@@ -98,10 +128,13 @@
     "coverage": {
       "page": 0,
       "page_size": 3,
-      "next_page": 1
+      "next_page": 1,
+      "compared": 3,
+      "only_catalog_metadata": true
     },
     "warnings": [
-      "Catalog metadata may be stale. Verify the original publisher, download availability, dataset-specific reuse licence, schema, units and update date before using data. No downstream distribution URL is fetched automatically."
+      "Catalog metadata may be stale. Verify the original publisher, download availability, dataset-specific reuse licence, schema, units and update date before using data. No downstream distribution URL is fetched automatically.",
+      "This comparison identifies metadata and missing checks, not working downloads, valid permission to reuse, observed data freshness or data quality."
     ],
     "notice": "Independent software by Sami Halawa; not an official government service. Verify consequential decisions in the official source."
   }

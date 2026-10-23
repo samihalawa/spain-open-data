@@ -1,14 +1,10 @@
-# Claude review — Spain Open Data 0.2.0
+# Claude review — Spain Open Data 0.3.0
 
 Publisher: Sami Halawa · Contact: sami@samihalawa.com
 
 Repository: https://github.com/samihalawa/spain-open-data
 
 Plugin at repository root. Stable identity: `spain-open-data`.
-
-Public product page: https://samihalawa.github.io/spain-open-data/
-
-Saved official-source report: https://samihalawa.github.io/spain-open-data/demo.html
 
 ## Listing
 
