@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
-    "version": "0.3.1"
+    "version": "0.4.0"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
       "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
-      "version": "0.3.1"
+      "version": "0.4.0"
     }
   ]
 }

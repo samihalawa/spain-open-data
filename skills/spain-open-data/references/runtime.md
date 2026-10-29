@@ -1,6 +1,6 @@
 # Runtime, privacy and source safety
 
-Claude Code loads the declared `spain-open-data` MCP from the plugin's .mcp.json. It runs the bundled Python 3.11+ stdio entry point as a local process, not a publisher-hosted service. No account, API key, package installation, shell launcher or remote executable is required.
+Compatible desktop hosts load the declared `spain-open-data` MCP from portable mcp.json; Claude Code uses its separate .mcp.json compatibility declaration. It runs the bundled Python 3.11+ stdio entry point as a local process, not a publisher-hosted service. No account, API key, package installation, shell launcher or remote executable is required.
 
 Invoke only the product's declared MCP tools. The server exposes the exact domain operations in references/mcp-tools.json, a historical offline example, and a deterministic text-report tool. It sends minimal public query parameters to the official providers in references/sources.md; no full conversation, profile, attachment or credential is forwarded. Authenticated proxy URLs are rejected before transport; unauthenticated proxy routing, bypass rules and TLS verification remain intact.
 

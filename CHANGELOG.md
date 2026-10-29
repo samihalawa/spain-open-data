@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+- Add portable local MCP and a Codex marketplace without removing the Claude configuration.
+- Replace letter marks with distinct generated symbols and a small Spanish flag at the border.
+- Synchronize desktop instructions, English base/Spanish listing metadata, review specifications and release notes.
+- Preserve upstream marketplace positioning and reconcile the documentary preview conflict.
+- Public directory approval, local-MCP partner eligibility and model-based review remain separate from package tests.
+
 ## 0.3.1
 
 - Declare a product-scoped local MCP with bounded JSON-RPC framing, dated demos and deterministic report text.

@@ -1,3 +1,5 @@
+> Historical baseline: the 0.3.0 source captures and results below belong to 23 October. The distributed package is now 0.4.0; current package, declared-host and review specifications are documented in [DEVELOPMENT.md](../DEVELOPMENT.md) and [SUBMISSION.md](../SUBMISSION.md). Archived JSON is preserved and is not relabelled as a current live check.
+
 # Verification evidence
 
 Candidate version: **0.3.0**, locally verified on 23 October 2026. `local-v0.3.0.json` records 86 fixture/offline CLI tests, package consistency and native strict validation. Current browser evidence, when present, is local fixture testing, not acceptance inside ChatGPT or Claude.

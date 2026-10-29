@@ -9,15 +9,14 @@
     "category": "Productivity",
     "composerIcon": "./assets/icon.png",
     "defaultPrompt": [
-      "Busca datasets de empleo y compáralos por formato, licencia y fecha.",
-      "Encuentra datos de mi municipio y distingue catálogo, descarga e inspección real.",
-      "Muéstrame un ejemplo y qué comprobar antes de reutilizar los datos."
+      "Find Spanish employment datasets with reusable formats and clear licences.",
+      "Check whether this public dataset is suitable for my analysis."
     ],
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
-    "logo": "./assets/icon.png",
-    "longDescription": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.\n\nDesarrolladores y equipos que buscan datos públicos reutilizables. Identificador del dataset reutilizable en la siguiente consulta. Publicador, formatos y licencia en una ficha comparable. Metadatos encontrados separados de un fichero realmente inspeccionado.\n\nEjemplos guardados sin conexión e informes HTML/Markdown/JSON. Sin cuenta adicional, claves API ni servicio propio. Claude Code invoca los adaptadores mediante el MCP local declarado (Python 3.11+ y red autorizada). Otros anfitriones utilizan únicamente sus herramientas nativas disponibles, sin ejecutar scripts como alternativa.\n\nNo descarga automáticamente distribuciones externas ni ejecuta archivos. No garantiza licencias o descargas vigentes. La fecha del catálogo no equivale al periodo del dato.",
-    "shortDescription": "Datasets listos para evaluar",
+    "logo": "./assets/logo.png",
+    "longDescription": "Find and compare Spanish public datasets by licence metadata, freshness and usable access links.\n\nUse bounded read-only official-source queries, a clearly dated offline example, and source-linked Markdown, HTML or JSON reports. Review returned dates, identifiers, provenance, errors and unexamined coverage before acting. No official affiliation, eligibility, legal, title, solvency or reuse-rights certification is claimed.\n\nRuns a bundled local stdio MCP on compatible desktop hosts with Python 3.11+ and authorized network access. No API key, account, dependency installation, hosted publisher service, telemetry or purchase functionality is provided. Reports return text without writing files. An unavailable local server is disclosed; scripts are never an execution fallback. This package does not create a web/mobile remote connection.",
+    "shortDescription": "Find reusable Spanish datasets",
     "websiteURL": "https://samihalawa.github.io/spain-open-data/",
     "supportURL": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/SUPPORT.md",
     "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/PRIVACY.md",
@@ -35,6 +34,8 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.3.1",
-  "homepage": "https://samihalawa.github.io/spain-open-data/"
+  "version": "0.4.0",
+  "homepage": "https://samihalawa.github.io/spain-open-data/",
+  "requires_local_executor": true,
+  "mcpServers": "./mcp.json"
 }

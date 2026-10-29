@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
-VERSION = "0.3.1"
+VERSION = "0.4.0"
 MADRID = ZoneInfo("Europe/Madrid")
 BOE = "https://www.boe.es"
 BDNS = "https://www.infosubvenciones.es/bdnstrans/api"

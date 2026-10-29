@@ -1,4 +1,4 @@
-# Data practices — local MCP skills release 0.3.1
+# Data practices — local MCP skills release 0.4.0
 
 This release contains reusable assistant instructions and one declared, bundled stdio MCP process for the local source adapters. The MCP returns data and report text and does not write report files. Authenticated proxy URLs are rejected before transport; unauthenticated system routing and TLS verification are preserved. It does not provision a publisher-operated server, user account, analytics system or payment system. The source code makes read-only requests to the official data providers listed in the product's sources document. Those requests necessarily include the search text, document identifier, date or cadastral reference needed for the task, and the provider sees the network address of the executing runtime. Do not include credentials or unrelated personal data in queries.
 

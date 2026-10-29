@@ -1,4 +1,4 @@
-# Claude review — Spain Open Data 0.3.1
+# Claude review — Spain Open Data 0.4.0
 
 Publisher: Sami Halawa · Contact: sami@samihalawa.com
 
@@ -26,4 +26,8 @@ README and PRIVACY.md disclose official query parameters, network-address exposu
 
 ## Directory review status
 
-Local protocol, security regressions and strict schema validation do not certify policy compliance. The prior portal findings require current revalidation and reviewer disposition. Public API access and reuse terms do not establish ownership/control under Directory Policy 3.F or its approved-connector exception. Those questions and owner legal attestations remain unresolved unless the provider/owner confirms them. Do not tick declarations or claim approval from this document.
+Local protocol, security regressions and strict schema validation do not certify policy compliance. The prior portal findings require current revalidation and reviewer disposition. Public API access and reuse terms do not establish ownership/control under Directory Policy 3.F or its approved-connector exception. The owner explicitly authorized the four Claude declarations in the 29 October conversation. Provider policy interpretation and fresh scan disposition still require review; this document does not claim approval.
+
+## OpenAI desktop review preparation
+
+Root plugin.json includes five positive and three negative review specifications, three starter prompts, release notes, non-commerce disclosure and Spanish listing translations. Countries are omitted to preserve existing targeting; no new region decision is inferred. Model-invocation cases are not recorded as passed. No reviewer credentials are needed for public official-source reads. A real intended-host demo recording URL and OpenAI organization eligibility remain provider-review requirements; no fabricated recording or remote endpoint is supplied. Private account updates and source distribution are distinct from public directory approval.

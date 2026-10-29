@@ -1,7 +1,7 @@
 {
   "name": "spain-open-data",
   "displayName": "Spain Open Data",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
   "author": {
     "name": "Sami Halawa",
