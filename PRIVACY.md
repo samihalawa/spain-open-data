@@ -1,4 +1,4 @@
-# Data practices — local skills release 0.2.0
+# Data practices — local skills release 0.3.0
 
 This release contains reusable assistant instructions and local source adapters. It does not provision a publisher-operated server, user account, analytics system or payment system. The source code makes read-only requests to the official data providers listed in the product's sources document. Those requests necessarily include the search text, document identifier, date or cadastral reference needed for the task, and the provider sees the network address of the executing runtime. Do not include credentials or unrelated personal data in queries.
 
