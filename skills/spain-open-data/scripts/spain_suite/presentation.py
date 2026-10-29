@@ -46,6 +46,13 @@ def observation_date(v: Any) -> str:
 
 
 def table_view(result: dict, tool: str):
+    if tool=='catastro_ficha':result={**result,'data':result.get('data',{}).get('property',{})};tool='catastro_property'
+    if tool=='ine_series_change':
+        d=result.get('data',{});return ['Indicador','Valor'],[['Serie',d.get('series_name')],['Periodo anterior',d.get('older_period')],['Valor anterior',d.get('older_value')],['Periodo posterior',d.get('newer_period')],['Valor posterior',d.get('newer_value')],['Cambio absoluto',d.get('absolute_change')],['Cambio porcentual',d.get('percentage_change')],['Unidad',d.get('unit')]]
+    if tool=='boe_find_articles':
+        return ['Bloque','Título','Versión seleccionada','Extracto'],[[x.get('block_id'),x.get('title'),x.get('selected_version'),x.get('excerpt')] for x in result.get('data',[])]
+    aliases={'licita_triage':'licita_search','ayudas_opportunities':'ayudas_shortlist','borme_events':'borme_company_range','open_data_compare':'open_data_search'}
+    tool=aliases.get(tool,tool)
     data=result.get('data');rows=data if isinstance(data,list) else [data] if isinstance(data,dict) else []
     if tool=='licita_search':
         cols=['Expediente','Licitación','Organismo','Presupuesto sin IVA','Cierre publicado','Lectura del plazo','Enlace']
@@ -79,14 +86,14 @@ def table_view(result: dict, tool: str):
 def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str:
     if fmt=='json':return json.dumps(result,ensure_ascii=False,indent=2)
     title=product.get('name',tool);example=result.get('example',{});sources=result.get('sources',[])
-    ok=result.get('ok') is True;partial=result.get('coverage',{}).get('partial',False)
+    ok=result.get('ok') is True;partial=bool(result.get('coverage',{}).get('partial',False) or result.get('errors'))
     label='EJEMPLO GUARDADO · no es una consulta en tiempo real' if example else 'RESULTADO PARCIAL · revisar incidencias' if partial else 'CONSULTA A FUENTES OFICIALES' if ok else 'FUENTE NO COMPROBADA'
     intro=product.get('promise','Informe con evidencia y alcance explícitos.')
     cols,rows=table_view(result,tool) if ok else ([],[])
-    status='No se han encontrado coincidencias dentro del alcance consultado.' if ok and not rows else 'La fuente no pudo comprobarse. No interpretes el error como cero resultados.' if not ok else f'{len(rows)} filas mostradas. La cobertura y las limitaciones se indican al final.'
+    status='La consulta es parcial y no muestra filas. No se puede concluir que no existan coincidencias; revisa las incidencias y la cobertura.' if ok and partial and not rows else 'No se han encontrado coincidencias dentro del alcance consultado.' if ok and not rows else 'La fuente no pudo comprobarse. No interpretes el error como cero resultados.' if not ok else f'{len(rows)} filas mostradas. La cobertura y las limitaciones se indican al final.'
     if fmt=='html':
         parts=['<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+html.escape(title)+' · Informe</title><style>'+CSS+'</style><body><main><header><div class="eyebrow">'+html.escape(title)+' / EVIDENCIA</div><h1>'+html.escape(title)+'</h1><p>'+html.escape(intro)+'</p><p class="badge">'+html.escape(label)+'</p></header><p class="notice">'+html.escape(status)+'</p>']
-        if example:parts.append('<p>Captura: '+html.escape(value(example.get('captured_at')))+'. Puedes reproducirla sin conexión con <code>demo</code>. Para datos actuales, ejecuta <code>report</code>.</p>')
+        if example:parts.append('<p>Captura: '+html.escape(value(example.get('captured_at')))+'. Reproduce el ejemplo con la herramienta de demostración del MCP declarado. Para datos actuales, solicita una consulta a ese MCP.</p>')
         if not ok:parts.append('<pre class="error">'+html.escape(json.dumps(result.get('error',{}),ensure_ascii=False,indent=2))+'</pre>')
         if rows:
             parts.append('<div class="scroll"><table><caption class="muted">Datos publicados; los textos extensos se abrevian en la tabla.</caption><thead><tr>'+''.join('<th scope="col">'+html.escape(c)+'</th>' for c in cols)+'</tr></thead><tbody>')
@@ -94,8 +101,11 @@ def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str
         if tool=='boe_compare' and ok:parts.append('<h2>Diferencia textual</h2><pre>'+html.escape(result['data'].get('unified_diff') or 'Sin cambios textuales en el bloque y fechas comparados.')+'</pre>')
         parts.append('<h2>Fuentes que puedes comprobar</h2>')
         for source in sources:
+            partial_source=source.get('complete') is False
+            hash_label='SHA-256 del prefijo' if partial_source else 'SHA-256'
+            source_scope=(' · Respuesta incompleta: '+str(source.get('bytes_retained','?'))+' bytes conservados') if partial_source else ''
             url=safe_link(source.get('url'));link='<a href="'+html.escape(url,quote=True)+'" rel="noreferrer noopener">'+html.escape(url)+'</a>' if url else html.escape(value(source.get('url')))
-            parts.append('<div class="source">'+link+'<br><small>Consulta: '+html.escape(value(source.get('retrieved_at')))+' · SHA-256: '+html.escape(value(source.get('sha256'))[:16])+'…</small></div>')
+            parts.append('<div class="source">'+link+'<br><small>Consulta: '+html.escape(value(source.get('retrieved_at')))+' · '+hash_label+': '+html.escape(value(source.get('sha256'))[:16])+'…'+html.escape(source_scope)+'</small></div>')
         parts.append('<h2>Alcance de esta consulta</h2><pre>'+html.escape(json.dumps(result.get('coverage',{}),ensure_ascii=False,indent=2))+'</pre>')
         if result.get('warnings'):parts.append('<details open><summary>Antes de tomar una decisión</summary>'+''.join('<p>'+html.escape(str(w))+'</p>' for w in result['warnings'])+'</details>')
         if result.get('errors'):parts.append('<pre class="error">'+html.escape(json.dumps(result['errors'],ensure_ascii=False,indent=2))+'</pre>')
@@ -109,8 +119,9 @@ def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str
     if not ok:parts+=['Error: '+value(result.get('error'))]
     if tool=='boe_compare' and ok:parts+=['','## Diferencia textual','', '    '+(result['data'].get('unified_diff') or 'Sin cambios textuales en el bloque y fechas comparados.').replace('\n','\n    ')]
     parts+=['','## Fuentes','']
-    for source in sources:parts+=['- '+cell(source.get('url'),'markdown')+' · Consulta: '+value(source.get('retrieved_at'))]
+    for source in sources:parts+=['- '+cell(source.get('url'),'markdown')+' · Consulta: '+value(source.get('retrieved_at'))+(' · Solo prefijo de respuesta: incompleta' if source.get('complete') is False else '')]
     parts+=['','## Alcance','', '    '+json.dumps(result.get('coverage',{}),ensure_ascii=False,indent=2).replace('\n','\n    ') ]
+    if result.get('errors'):parts+=['','## Incidencias de la consulta','', '    '+json.dumps(result['errors'],ensure_ascii=False,indent=2).replace('\n','\n    ')]
     parts+=['','## Límites y comprobaciones','']+[ '- '+html.escape(str(w)) for w in result.get('warnings',[]) ]
     parts+=['','Software independiente de Sami Halawa. Conserva el JSON para inspeccionar todos los campos y textos completos.']
     return '\n'.join(parts)+'\n'

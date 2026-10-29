@@ -1,0 +1,78 @@
+{
+  "version": "0.3.0",
+  "checked_at": "2026-10-20T16:59:24.641136+00:00",
+  "core_sha256": "303c3b3fd75b1544cf7120d5d37ef61f7d2445e508381af01ef8a25b6df6d530",
+  "scope": "Official-provider adapter smoke checks; not model-based task acceptance or adoption.",
+  "passed": 3,
+  "total": 3,
+  "tests": [
+    {
+      "tool": "open_data_compare",
+      "arguments": {
+        "query": "empleo",
+        "page_size": 3
+      },
+      "ok": true,
+      "duration_seconds": 0.58,
+      "coverage": {
+        "page": 0,
+        "page_size": 3,
+        "next_page": 1,
+        "compared": 3,
+        "only_catalog_metadata": true
+      },
+      "sources": [
+        {
+          "url": "https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3",
+          "retrieved_at": "2026-10-20T16:59:02.448773+00:00",
+          "sha256": "53752ffffe2e271e2a8df1ee18fc52f41ccaf03d1c1791b4900c0b02be6a06f3",
+          "cache_hit": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "tool": "open_data_search",
+      "arguments": {
+        "query": "empleo",
+        "page_size": 2
+      },
+      "ok": true,
+      "duration_seconds": 0.34,
+      "coverage": {
+        "page": 0,
+        "page_size": 2,
+        "next_page": 1
+      },
+      "sources": [
+        {
+          "url": "https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=2",
+          "retrieved_at": "2026-10-20T16:59:06.196171+00:00",
+          "sha256": "8af8d87d36ac91e6cdb57b75e907a95d1858576418e2a25d983ddd52a71eb06a",
+          "cache_hit": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "tool": "open_data_dataset",
+      "arguments": {
+        "dataset_id": "l01281317-ofertas-de-empleo-publico-y-convocatorias-del-ayuntamiento"
+      },
+      "ok": true,
+      "duration_seconds": 0.5,
+      "coverage": {
+        "dataset_id": "l01281317-ofertas-de-empleo-publico-y-convocatorias-del-ayuntamiento"
+      },
+      "sources": [
+        {
+          "url": "https://datos.gob.es/apidata/catalog/dataset/l01281317-ofertas-de-empleo-publico-y-convocatorias-del-ayuntamiento.json",
+          "retrieved_at": "2026-10-20T16:59:24.465520+00:00",
+          "sha256": "2e4e903f026a08db07d0111a798534f239d9e09c659133bd5d0c50c673d69138",
+          "cache_hit": false
+        }
+      ],
+      "error": null
+    }
+  ]
+}

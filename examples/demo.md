@@ -6,7 +6,7 @@ Encuentra el dataset. Comprueba si te sirve.
 
 3 filas mostradas. La cobertura y las limitaciones se indican al final.
 
-Captura guardada: 2026-10-20T16:20:04.937305+00:00.
+Captura guardada: 2026-10-20T16:59:24.559646+00:00.
 
 | Dataset | Publicador | Actualización del catálogo | Formatos | Licencia declarada | Catálogo |
 |---|---|---|---|---|---|
@@ -16,18 +16,21 @@ Captura guardada: 2026-10-20T16:20:04.937305+00:00.
 
 ## Fuentes
 
-- [Fuente oficial](https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3) · Consulta: 2026-10-20T16:19:44.906859+00:00
+- [Fuente oficial](https://datos.gob.es/apidata/catalog/dataset/title/empleo.json?_page=0&_pageSize=3) · Consulta: 2026-10-20T16:59:02.448773+00:00
 
 ## Alcance
 
     {
       "page": 0,
       "page_size": 3,
-      "next_page": 1
+      "next_page": 1,
+      "compared": 3,
+      "only_catalog_metadata": true
     }
 
 ## Límites y comprobaciones
 
 - Catalog metadata may be stale. Verify the original publisher, download availability, dataset-specific reuse licence, schema, units and update date before using data. No downstream distribution URL is fetched automatically.
+- This comparison identifies metadata and missing checks, not working downloads, valid permission to reuse, observed data freshness or data quality.
 
 Software independiente de Sami Halawa. Conserva el JSON para inspeccionar todos los campos y textos completos.

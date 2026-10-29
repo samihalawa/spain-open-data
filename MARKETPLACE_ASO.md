@@ -1,4 +1,4 @@
-# Spain Open Data — marketplace positioning and evaluation (public release v0.2.0)
+# Spain Open Data — marketplace positioning and evaluation (release candidate v0.4.0)
 
 ## Search intent and differentiation
 
@@ -28,9 +28,9 @@
 
 ## Platform-specific packaging
 
-**Claude Code:** Install the existing self-contained skills plugin from this repository or the shared `sami-spain-assistants` catalog. Verify that the plugin loads and that its actual Python 3.11+ adapters work in the target environment.
+**Claude Code:** Install the existing self-contained skills plugin from this repository or the shared `sami-spain-assistants` catalog. Verify the declared local MCP loads and that its Python 3.11+ adapters work in the target environment; no script fallback is instructed.
 
-**ChatGPT/Codex skills-only:** Package the actual implemented skills, icon and verified metadata. Do not claim the skills-only package creates a hosted MCP connection.
+**Codex/OpenAI desktop:** The package retains skills and a declared local stdio MCP in portable mcp.json. Public OpenAI distribution requires an approved, allowlisted submitting organization. Saving a private plugin is not public approval and does not create a hosted connection.
 
 **Interactive MCP Apps (separate future release):** Provide a publicly deployed streamable-HTTP MCP server. Its tool must advertise `_meta.ui.resourceUri`, and the server must return a `ui://` resource with MIME `text/html;profile=mcp-app`. A UI must improve comparison/review without obscuring original sources; the tool must remain useful if the host cannot render it.
 

@@ -1,7 +1,7 @@
 {
   "name": "spain-open-data",
   "displayName": "Spain Open Data",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
   "author": {
     "name": "Sami Halawa",
@@ -19,8 +19,9 @@
   "homepage": "https://samihalawa.github.io/spain-open-data/",
   "repository": "https://github.com/samihalawa/spain-open-data",
   "icon": "./assets/icon.png",
-  "documentationUrl": "https://github.com/samihalawa/spain-open-data/blob/main/README.md",
-  "supportUrl": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
-  "privacyPolicyUrl": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
-  "termsOfServiceUrl": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
+  "documentationUrl": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/README.md",
+  "supportUrl": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/SUPPORT.md",
+  "privacyPolicyUrl": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/TERMS.md",
+  "mcpServers": "./.mcp.json"
 }

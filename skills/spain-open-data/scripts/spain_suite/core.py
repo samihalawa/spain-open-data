@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
-VERSION = "0.2.0"
+VERSION = "0.4.0"
 MADRID = ZoneInfo("Europe/Madrid")
 BOE = "https://www.boe.es"
 BDNS = "https://www.infosubvenciones.es/bdnstrans/api"
@@ -88,6 +88,23 @@ class _SafeRedirect(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
+class _CredentialFreeProxy(urllib.request.ProxyHandler):
+    """Keep system proxy routing, but never use ambient proxy credentials."""
+    def proxy_open(self, req, proxy, type):
+        # A bypassed proxy is unused. Defer validation until a live request so
+        # offline commands still work in environments with authenticated proxies.
+        if req.host and urllib.request.proxy_bypass(req.host):
+            return None
+        # urllib accepts authority-only proxies and userinfo containing slashes.
+        # Reject the delimiter before its permissive parser can add auth headers.
+        if "@" in proxy:
+            raise SourceError("proxy_credentials_blocked", "Authenticated proxy URLs are not supported; no connection was made.")
+        try:
+            return super().proxy_open(req, proxy, type)
+        except ValueError:
+            raise SourceError("invalid_proxy", "The configured proxy URL is invalid.") from None
+
+
 @dataclass(frozen=True)
 class Fetch:
     body: bytes
@@ -95,9 +112,13 @@ class Fetch:
     fetched_at: str
     content_type: str
     cached: bool = False
+    complete: bool = True
 
     def provenance(self) -> dict[str, Any]:
-        return {"url": self.url, "retrieved_at": self.fetched_at, "sha256": hashlib.sha256(self.body).hexdigest(), "cache_hit": self.cached}
+        record = {"url": self.url, "retrieved_at": self.fetched_at, "sha256": hashlib.sha256(self.body).hexdigest(), "cache_hit": self.cached}
+        if not self.complete:
+            record.update(complete=False, sha256_scope="response_prefix", bytes_retained=len(self.body), byte_limit=MAX_BYTES)
+        return record
 
     def json(self) -> Any:
         try:
@@ -109,10 +130,39 @@ class Fetch:
         # Reject DTD/entity declarations before using the standard-library XML parser.
         if re.search(br"<!\s*(DOCTYPE|ENTITY)\b", self.body.replace(b"\x00", b""), re.I):
             raise SourceError("unsafe_xml", "DTD/entity declarations are not accepted.", self.url)
+        if not self.complete:
+            return _atom_prefix(self.body, self.url)
         try:
             return ET.fromstring(self.body)
         except ET.ParseError as exc:
             raise SourceError("invalid_response", "The source did not return valid XML.", self.url) from exc
+
+
+def _atom_prefix(body: bytes, url: str) -> ET.Element:
+    """Retain only completed direct children; never claim a clipped document is complete."""
+    _feed_url(url)
+    parser = ET.XMLPullParser(events=("start", "end"))
+    root = None
+    depth = 0
+    try:
+        parser.feed(body)
+        for event, node in parser.read_events():
+            if event == "start":
+                depth += 1
+                if depth == 1:
+                    if node.tag != "{http://www.w3.org/2005/Atom}feed":
+                        raise SourceError("schema_changed", "Expected an official Atom feed.", url)
+                    root = ET.Element(node.tag, node.attrib)
+            else:
+                if depth == 2 and root is not None:
+                    root.append(node)
+                depth -= 1
+        # Do not close the parser: EOF is deliberately not asserted for a prefix.
+    except ET.ParseError as exc:
+        raise SourceError("invalid_response", "The retained Atom prefix contains malformed XML.", url) from exc
+    if root is None or not any(node.tag == "{http://www.w3.org/2005/Atom}entry" for node in root):
+        raise SourceError("response_too_large", "No complete Atom entry fits inside the bounded response window (at most 8 MiB); no tender results were inferred.", url)
+    return root
 
 
 class OfficialClient:
@@ -122,18 +172,22 @@ class OfficialClient:
         self.cache: OrderedDict[str, tuple[float, Fetch]] = OrderedDict()
         self.lock = threading.Lock()
         self.last_request: dict[str, float] = {}
-        self.opener = urllib.request.build_opener(_SafeRedirect())
+        self.opener = urllib.request.build_opener(_CredentialFreeProxy(), _SafeRedirect())
 
-    def get(self, url: str, params: dict[str, Any] | None = None, accept: str = "application/json") -> Fetch:
+    def get(self, url: str, params: dict[str, Any] | None = None, accept: str = "application/json", *, allow_atom_prefix: bool = False) -> Fetch:
         if params:
             url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params)
         safe_url(url)
-        key = accept + " " + url
+        if allow_atom_prefix:
+            _feed_url(url)
+            if accept != "application/atom+xml":
+                raise SourceError("invalid_input", "Bounded prefixes are supported only for the official PLACSP Atom feed.")
+        key = accept + " " + url + (" prefix" if allow_atom_prefix else "")
         with self.lock:
             cached = self.cache.get(key)
             if cached and time.monotonic() - cached[0] < self.ttl:
                 f = cached[1]
-                return Fetch(f.body, f.url, f.fetched_at, f.content_type, True)
+                return Fetch(f.body, f.url, f.fetched_at, f.content_type, True, complete=f.complete)
             host = urllib.parse.urlsplit(url).hostname or ""
             wait = max(0.0, self.last_request.get(host, 0.0) + .25 - time.monotonic())
             self.last_request[host] = time.monotonic() + wait
@@ -144,16 +198,24 @@ class OfficialClient:
             try:
                 with self.opener.open(req, timeout=20) as response:
                     safe_url(response.geturl())
-                    chunks, total = [], 0
+                    chunks, total, complete = [], 0, True
+                    # PLACSP pages are large: use a smaller latency-bounded window
+                    # for interactive reads, under the unchanged global 8 MiB cap.
+                    read_limit = min(MAX_BYTES, 1024 * 1024) if allow_atom_prefix else MAX_BYTES
                     while True:
-                        part = response.read(65536)
+                        # One lookahead byte detects overflow; retained/parsing bytes stay capped.
+                        part = response.read(min(65536, read_limit - total + 1))
                         if not part:
                             break
                         total += len(part)
-                        if total > MAX_BYTES:
-                            raise SourceError("response_too_large", "Official response exceeds the 8 MiB safety limit; narrow the query.", url)
+                        if total > read_limit:
+                            if not allow_atom_prefix:
+                                raise SourceError("response_too_large", "Official response exceeds the 8 MiB safety limit; narrow the query.", url)
+                            chunks.append(part[:len(part) - (total - read_limit)])
+                            complete = False
+                            break
                         chunks.append(part)
-                    f = Fetch(b"".join(chunks), response.geturl(), dt.datetime.now(dt.timezone.utc).isoformat(), response.headers.get("Content-Type", ""))
+                    f = Fetch(b"".join(chunks), response.geturl(), dt.datetime.now(dt.timezone.utc).isoformat(), response.headers.get("Content-Type", ""), complete=complete)
                 with self.lock:
                     self.cache[key] = (time.monotonic(), f)
                     self.cache.move_to_end(key)
@@ -272,23 +334,30 @@ def _feed_url(url: str) -> str:
 
 
 def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 20, cursor: str = "", offset: int = 0, deadline_from: str = "") -> dict[str, Any]:
-    """Search a bounded PLACSP feed window with lossless within-page continuation. Optional deadline_from filters dates, not legal application status."""
+    """Search a bounded PLACSP window. Oversized pages expose complete prefix entries with explicit partial coverage; continuation never skips an unread suffix. Optional deadline_from filters dates, not legal application status."""
     query=text_input(query,"query");cpv_prefix=text_input(cpv_prefix,"cpv_prefix",8)
     if cpv_prefix and not re.fullmatch(r"\d{2,8}",cpv_prefix):raise SourceError("invalid_input","cpv_prefix must contain 2–8 digits.")
     integer(max_pages,"max_pages",1,3);integer(limit,"limit",1,50);integer(offset,"offset",0,100000)
     threshold=date_input(deadline_from) if deadline_from else None
     url=_feed_url(cursor or PLACSP);rows=[];sources=[];seen=set();deleted=set();visited=set();scanned=0;unknown_deadlines=0;errors=[]
     next_url=None;next_offset=None;stopped=False;offset_on_page=offset
+    prefix_pages=[];older_page_cursor=None;continuation_blocked_reason=None
     for _ in range(max_pages):
         if url in visited:raise SourceError("schema_changed","The source returned a cyclic continuation link.",url)
         visited.add(url)
         try:
-            f=CLIENT.get(_feed_url(url),accept="application/atom+xml");root=f.xml()
+            f=CLIENT.get(_feed_url(url),accept="application/atom+xml",allow_atom_prefix=True);root=f.xml()
             if root.tag!="{http://www.w3.org/2005/Atom}feed":raise SourceError("schema_changed","Expected an official Atom feed.",f.url)
         except SourceError as exc:
-            if not sources:raise
+            if not sources:
+                if exc.code == "response_too_large":
+                    raise SourceError("response_too_large", "The official PLACSP Atom page exceeds the 8 MiB read limit. Query, limit and max_pages filter after retrieval and cannot reduce this upstream page. No tender results were inferred.", exc.source_url) from exc
+                raise
             errors.append({"code":exc.code,"message":str(exc),"source_url":exc.source_url});next_url=url;next_offset=offset_on_page;break
         sources.append(f)
+        if not f.complete:
+            prefix_pages.append(f.url)
+            errors.append({"code":"response_prefix_only","message":f"Only complete entries within the retained {len(f.body)}-byte prefix were parsed. The page suffix, later entries and tombstones were not examined.","source_url":f.url})
         deleted.update(e.attrib.get("ref","") for e in descendants(root,"deleted-entry"))
         entries=[e for e in root if local_name(e.tag)=="entry"]
         if offset_on_page>len(entries):raise SourceError("invalid_input","Offset exceeds this feed page; start again because the live feed may have changed.",f.url)
@@ -315,17 +384,29 @@ def licita_search(query: str = "", cpv_prefix: str = "", max_pages: int = 1, lim
             hrefs=[e.attrib.get("href") for e in entry if local_name(e.tag)=="link" and e.attrib.get("rel","alternate")=="alternate"]
             rows.append({"id":eid,"title":title,"official_url":hrefs[0] if hrefs else eid,"updated":path_text(entry,"updated"),"reference":first_text(status,"ContractFolderID"),"status_code":first_text(status,"ContractFolderStatusCode"),"authority":first_text(parties[0],"Name") if parties else None,"cpv":cpvs,"budget_excluding_tax":first_text(budget[0],"TaxExclusiveAmount") if budget else None,"currency":next((e.attrib.get("currencyID") for e in budget[0] if local_name(e.tag)=="TaxExclusiveAmount"),None) if budget else None,"deadline_date":end,"deadline_time":first_text(deadlines[0],"EndTime") if deadlines else None,"deadline_assessment":assessment,"document_urls":list(dict.fromkeys(docs))})
         if stopped:break
+        if not f.complete:
+            candidate=next((e.attrib.get("href") for e in root if local_name(e.tag)=="link" and e.attrib.get("rel")=="next"),None)
+            older_page_cursor=_feed_url(candidate) if candidate else None
+            # Advancing to an older page would silently skip the unread suffix.
+            next_url=None;next_offset=None;continuation_blocked_reason="unread_page_suffix"
+            break
         next_url=next((e.attrib.get("href") for e in root if local_name(e.tag)=="link" and e.attrib.get("rel")=="next"),None)
         next_offset=0 if next_url else None
         if not next_url:break
         url=_feed_url(next_url);offset_on_page=0
     rows=[r for r in rows if r['id'] not in deleted]
     warnings=["Bounded feed window, not all Spanish tenders. A future deadline does not establish an open procedure; verify status, lots, amendments and the official profile.","Continuation preserves within-page matches. Live feed pages can change; deduplicate stable tender IDs across calls."]
+    if prefix_pages:
+        warnings.append("Partial source: only complete entries inside a bounded response prefix (at most 1 MiB for interactive reads, below the 8 MiB hard limit) were checked. Entries and cancellation tombstones outside it remain unexamined. A prefix SHA-256 does not identify the complete feed. Verify each contracting profile.")
+    if continuation_blocked_reason:
+        warnings.append("Lossless continuation is blocked at the unread page suffix. The separately reported older_page_cursor is an optional older window, not continuation past all entries in this page.")
     if threshold:warnings.append("deadline_from excludes missing/unparseable deadlines; these exclusions are counted separately.")
     next_args={"query":query,"cpv_prefix":cpv_prefix,"max_pages":max_pages,"limit":limit,"cursor":next_url,"offset":next_offset,"deadline_from":deadline_from} if next_url else None
-    result=envelope(rows,sources,warnings,pages_fetched=len(sources),entries_examined=scanned,returned=len(rows),result_limit_reached=stopped,next_cursor=next_url,next_offset=next_offset,next_request=next_args,unknown_deadlines_excluded=unknown_deadlines,deleted_ids_observed=len(deleted),partial=bool(errors),exhaustive=False)
+    result=envelope(rows,sources,warnings,pages_fetched=len(sources),entries_examined=scanned,returned=len(rows),result_limit_reached=stopped,next_cursor=next_url,next_offset=next_offset,next_request=next_args,unknown_deadlines_excluded=unknown_deadlines,deleted_ids_observed=len(deleted),partial=bool(errors),exhaustive=False,prefix_pages=prefix_pages,older_page_cursor=older_page_cursor,continuation_blocked_reason=continuation_blocked_reason)
     if errors:
-        result["errors"]=errors;result["warnings"].append("A later feed page could not be read. Earlier results are preserved; do not claim that the complete requested window was checked.")
+        result["errors"]=errors
+        if any(error["code"] != "response_prefix_only" for error in errors):
+            result["warnings"].append("A later feed page could not be read. Earlier results are preserved; do not claim that the complete requested window was checked.")
     return result
 
 
@@ -655,14 +736,125 @@ def borme_company_range(company: str, start_date: str, end_date: str, province: 
     return out
 
 
+def licita_triage(query: str = "", cpv_prefix: str = "", max_pages: int = 1, limit: int = 15, cursor: str = "", offset: int = 0, deadline_from: str = "") -> dict[str, Any]:
+    """Fast triage of one bounded official PLACSP feed window. A date bucket is not a bid/no-bid determination."""
+    base=licita_search(query=query,cpv_prefix=cpv_prefix,max_pages=max_pages,limit=limit,cursor=cursor,offset=offset,deadline_from=deadline_from)
+    rows=[];counts={}
+    for item in base['data']:
+        flag=item.get('deadline_assessment',{}).get('date_state','deadline_not_established')
+        if flag in ('past_end_date',):bucket='published_deadline_passed'
+        elif flag in ('within_published_dates','ends_today_check_time','end_date_ahead_start_unverified'):bucket='published_deadline_requires_verification'
+        else:bucket='deadline_or_status_unknown'
+        counts[bucket]=counts.get(bucket,0)+1
+        rows.append({**item,'review_bucket':bucket,'next_action':'Check the current official contracting profile, all lots, PCAP/PPT, corrections and procedure status before deciding whether to bid.'})
+    out={**base,'data':rows,'coverage':{**base['coverage'],'buckets_in_returned_rows':counts},'warnings':base.get('warnings',[])+['These are date-based and unknown-status triage buckets, not confirmation that a call is open, that you qualify or that any filing was submitted.']}
+    return out
+
+
+def ayudas_opportunities(query: str, page: int = 0, limit: int = 5, as_of: str = "") -> dict[str, Any]:
+    """Actionability triage of up to five BDNS records based on published fields; no invented eligibility or grant approval."""
+    base=ayudas_shortlist(query,page,limit,as_of)
+    categories={'review_dates_and_bases':0,'possible_direct_award':0,'published_deadline_passed':0,'details_unavailable':0}
+    ranked=[]
+    for row in base['data']:
+        state=(row.get('deadline_assessment') or {}).get('date_state','deadline_not_established')
+        if row.get('detail_error'):category='details_unavailable'
+        elif row.get('direct_award_signal'):category='possible_direct_award'
+        elif state=='past_end_date':category='published_deadline_passed'
+        else:category='review_dates_and_bases'
+        categories[category]+=1
+        ranked.append({**row,'review_bucket':category,'next_action':'Read the complete bases, eligible beneficiaries, later amendments and actual submission portal.'})
+    ordered={'review_dates_and_bases':0,'details_unavailable':1,'possible_direct_award':2,'published_deadline_passed':3}
+    ranked.sort(key=lambda x:(ordered[x['review_bucket']],str((x.get('deadline_assessment') or {}).get('end_date') or '9999')))
+    return {**base,'data':ranked,'coverage':{**base['coverage'],'buckets_in_returned_rows':categories},'warnings':base.get('warnings',[])+['Triage order is a review order only, not a recommendation that an applicant qualifies.']}
+
+
+def boe_find_articles(law_id: str, query: str, as_of: str = "", offset: int = 0, limit: int = 10, search_text: bool = False) -> dict[str, Any]:
+    """Locate block IDs by article title (and optionally text) before version comparison. Searches one named consolidated law."""
+    q=text_input(query,'query',120,False);integer(offset,'offset',0,100000);integer(limit,'limit',1,30)
+    if not isinstance(search_text,bool):raise SourceError('invalid_input','search_text must be true or false.')
+    day=date_input(as_of);f,blocks=_law(law_id);terms=fold(q).split();matches=[]
+    for block in blocks:
+        title=block.get('titulo') or '';selected=_version(block,day);body=inner_text(selected) if selected is not None else ''
+        haystack=fold(title+' '+body) if search_text else fold(title)
+        if all(term in haystack for term in terms):
+            matches.append({'block_id':block.get('id'),'title':title,'type':block.get('tipo'),'selected_version':dict(selected.attrib) if selected is not None else None,'excerpt':body[:450] if selected is not None else None,'text_searched':search_text})
+    return envelope(matches[offset:offset+limit],[f],['Search covers only this law and the selected date. A matched article is not a finding of legal applicability. Use boe_compare with its returned block_id and explicit dates.'],law_id=law_id,query=q,as_of=day.isoformat(),matches=len(matches),returned=len(matches[offset:offset+limit]),next_offset=offset+limit if offset+limit<len(matches) else None,search_text=search_text)
+
+
+_BORME_EVENTS=(('incorporation',r'\bconstitucion\b'),('dissolution',r'\bdisolucion\b'),('registered_office_change',r'\bcambio de domicilio\b'),('appointment',r'\bnombramientos?\b'),('resignation',r'\bceses?\b|\bdimisiones?\b'),('capital_increase',r'\bampliacion de capital\b'),('capital_reduction',r'\breduccion de capital\b'),('correction',r'\bfe de erratas\b|\brectificacion\b'),('insolvency_proceeding',r'\bconcurso\b'))
+
+
+def borme_events(company: str, start_date: str, end_date: str, province: str = 'MADRID', limit: int = 20) -> dict[str, Any]:
+    """Classify dated BORME company notices conservatively using visible keyword rules; no credit/fraud predictions."""
+    base=borme_company_range(company,start_date,end_date,province,limit)
+    rows=[];counts={}
+    for row in base['data']:
+        body=fold(row.get('text') or '')
+        categories=[key for key,pattern in _BORME_EVENTS if re.search(pattern,body)] or ['unclassified']
+        for key in categories:counts[key]=counts.get(key,0)+1
+        rows.append({**row,'event_categories':categories,'classification':'keyword_heuristic_not_certified'})
+    return {**base,'data':rows,'coverage':{**base['coverage'],'event_category_counts_in_returned_rows':counts},'warnings':base.get('warnings',[])+['Event categories are deterministic keyword signals applied to the preserved official notice text, not certified company status, economic risk or beneficial ownership.']}
+
+
+def catastro_ficha(reference: str) -> dict[str, Any]:
+    """One-call public cadastral description and coordinate reference point with visible partial failures."""
+    property_result=catastro_property(reference)
+    errors=[];coordinate=None;source_records=property_result['sources'][:]
+    try:
+        position=catastro_coordinates(reference);source_records.extend(position['sources']);coordinate=position['data']
+    except SourceError as exc:
+        errors.append({'component':'coordinates','code':exc.code,'message':str(exc),'source_url':exc.source_url})
+    out={'ok':True,'data':{'property':property_result['data'],'coordinates':coordinate,'title_verified':False,'planning_verified':False},'sources':source_records,'coverage':{'reference':reference,'description_checked':True,'coordinate_checked':coordinate is not None,'partial':bool(errors)},'warnings':property_result['warnings']+['A reference point is not a surveyed boundary. A cadastral description is not evidence of ownership, legal occupation, or planning permission.'],'notice':SOURCE_NOTICE}
+    if errors:out['errors']=errors
+    return out
+
+
+def ine_series_change(series_code: str, last: int = 12) -> dict[str, Any]:
+    """Compare the last two non-confidential numerical observations in an INE series, without inventing frequency or annualised growth."""
+    base=ine_series(series_code,last);body=base['data'];entries=[]
+    for r in as_list(body.get('Data')):
+        if not isinstance(r,dict) or r.get('Secreto') is True:continue
+        v=r.get('Valor')
+        if not isinstance(v,(int,float)) or isinstance(v,bool) or not math.isfinite(v):continue
+        when=r.get('Fecha')
+        try:
+            if isinstance(when,(int,float)) and not isinstance(when,bool):day=dt.datetime.fromtimestamp(when/1000,MADRID).date()
+            elif isinstance(when,str):
+                stamp=dt.datetime.fromisoformat(when.replace('Z','+00:00'));day=stamp.astimezone(MADRID).date() if stamp.tzinfo else stamp.date()
+            else:continue
+        except (OverflowError,ValueError,OSError):continue
+        entries.append((day,v,r))
+    entries.sort(key=lambda x:x[0]);uniq={x[0]:x for x in entries};values=list(uniq.values())
+    if len(values)<2:raise SourceError('insufficient_observations','Fewer than two comparable non-confidential numeric observations were returned. No change was inferred.')
+    (older_date,older,older_raw),(newer_date,newer,newer_raw)=values[-2:]
+    delta=newer-older;percent=(delta/older*100) if older!=0 else None
+    return {**base,'data':{'series_code':series_code,'series_name':body.get('Nombre'),'unit':body.get('T3_Unidad',body.get('FK_Unidad')),'scale':body.get('T3_Escala',body.get('FK_Escala')),'older_period':older_date.isoformat(),'newer_period':newer_date.isoformat(),'older_value':older,'newer_value':newer,'absolute_change':delta,'percentage_change':percent,'percentage_change_unavailable_reason':'zero_baseline' if older==0 else None,'older_record':older_raw,'newer_record':newer_raw},'coverage':{**base['coverage'],'observations_requested':last,'non_confidential_numeric_periods':len(values)},'warnings':base.get('warnings',[])+['This is a two-observation arithmetic comparison, not an annualised rate or a statement about statistical significance. Check units, base, adjustments, provisional flags and comparability before interpreting it.']}
+
+
+def open_data_compare(query: str, page: int = 0, page_size: int = 8) -> dict[str, Any]:
+    """Compare dataset catalog metadata and verification gaps without fetching downstream files or certifying licences."""
+    base=open_data_search(query,page,page_size);rows=[]
+    for row in base['data']:
+        dist=as_list(row.get('distributions'))
+        formats=sorted({str(d.get('format')).rsplit('/',1)[-1] for d in dist if isinstance(d,dict) and d.get('format')})
+        links=[url for d in dist if isinstance(d,dict) for url in [d.get('download_url') or d.get('access_url')] if isinstance(url,str) and url.strip()]
+        declared=row.get('license')
+        gaps=[]
+        if not declared:gaps.append('licence_not_declared')
+        if not links:gaps.append('no_distribution_link')
+        if not row.get('modified'):gaps.append('catalog_update_date_missing')
+        rows.append({**row,'formats':formats,'distribution_count':len(dist),'declared_licence':declared,'catalog_metadata_gaps':gaps,'download_checked':False,'distribution_schema_checked':False,'reuse_rights_verified':False})
+    return {**base,'data':rows,'coverage':{**base['coverage'],'compared':len(rows),'only_catalog_metadata':True},'warnings':base.get('warnings',[])+['This comparison identifies metadata and missing checks, not working downloads, valid permission to reuse, observed data freshness or data quality.']}
+
 PRODUCT_TOOLS: dict[str,list[Callable[...,dict[str,Any]]]] = {
-    "licita-espana":[licita_search],
-    "ayudas-espana":[ayudas_search,ayudas_call,ayudas_shortlist],
-    "boe-impact":[boe_daily,boe_document,boe_consolidated,boe_compare],
-    "borme-intelligence":[borme_company_notices,borme_company_range],
-    "catastro-pro":[catastro_property,catastro_coordinates],
-    "ine-evidence":[ine_operations,ine_tables,ine_table_series,ine_series],
-    "spain-open-data":[open_data_search,open_data_dataset],
+    "licita-espana":[licita_search,licita_triage],
+    "ayudas-espana":[ayudas_search,ayudas_call,ayudas_shortlist,ayudas_opportunities],
+    "boe-impact":[boe_daily,boe_document,boe_consolidated,boe_compare,boe_find_articles],
+    "borme-intelligence":[borme_company_notices,borme_company_range,borme_events],
+    "catastro-pro":[catastro_property,catastro_coordinates,catastro_ficha],
+    "ine-evidence":[ine_operations,ine_tables,ine_table_series,ine_series,ine_series_change],
+    "spain-open-data":[open_data_search,open_data_dataset,open_data_compare],
 }
 TOOLS = {f.__name__:f for functions in PRODUCT_TOOLS.values() for f in functions}
 

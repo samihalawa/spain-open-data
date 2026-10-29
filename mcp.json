@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "spain-open-data": {
+      "command": "python3",
+      "args": [
+        "${PLUGIN_ROOT}/skills/spain-open-data/scripts/mcp_server.py"
+      ],
+      "cwd": "${PLUGIN_ROOT}",
+      "type": "stdio"
+    }
+  }
+}
