@@ -99,3 +99,7 @@ Las respuestas oficiales pueden contener nombres, direcciones u otros datos pers
 ## Identidad visual
 
 Un símbolo sencillo identifica esta función y una pequeña bandera española marca el borde. No es un escudo ni un sello oficial, y no implica afiliación gubernamental. [Logo de ficha](assets/logo.png) · [Icono compacto](assets/icon.png).
+
+## Docker
+
+[Container build, stdio setup and offline examples](DOCKER.md). The container uses the same 0.4.0 adapters and does not create a hosted MCP endpoint.

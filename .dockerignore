@@ -1,0 +1,14 @@
+**
+!Dockerfile
+!skills/
+!skills/spain-open-data/
+!skills/spain-open-data/scripts/
+!skills/spain-open-data/scripts/**
+!skills/spain-open-data/references/
+!skills/spain-open-data/references/**
+!LICENSE
+!SECURITY.md
+!PRIVACY.md
+!SUPPORT.md
+**/__pycache__/
+**/*.pyc
