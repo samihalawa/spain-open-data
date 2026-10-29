@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+- Declare a product-scoped local MCP with bounded JSON-RPC framing, dated demos and deterministic report text.
+- Keep skill execution inside that declared MCP; retain the separate developer CLI.
+- Reject ambient proxy credentials without disabling proxy routing or TLS.
+- Use minimal test subprocess environments; clarify runtime, privacy and unresolved directory-policy claims.
+
+
 ## 0.3.0 — 2026-10-20
 
 **Critique:** Una lista de enlaces se parecía demasiado a una búsqueda genérica. Faltaba una ficha útil y el identificador explícito para continuar.

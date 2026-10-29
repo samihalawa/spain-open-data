@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 MADRID = ZoneInfo("Europe/Madrid")
 BOE = "https://www.boe.es"
 BDNS = "https://www.infosubvenciones.es/bdnstrans/api"
@@ -86,6 +86,23 @@ class _SafeRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         safe_url(newurl)
         return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+class _CredentialFreeProxy(urllib.request.ProxyHandler):
+    """Keep system proxy routing, but never use ambient proxy credentials."""
+    def proxy_open(self, req, proxy, type):
+        # A bypassed proxy is unused. Defer validation until a live request so
+        # offline commands still work in environments with authenticated proxies.
+        if req.host and urllib.request.proxy_bypass(req.host):
+            return None
+        # urllib accepts authority-only proxies and userinfo containing slashes.
+        # Reject the delimiter before its permissive parser can add auth headers.
+        if "@" in proxy:
+            raise SourceError("proxy_credentials_blocked", "Authenticated proxy URLs are not supported; no connection was made.")
+        try:
+            return super().proxy_open(req, proxy, type)
+        except ValueError:
+            raise SourceError("invalid_proxy", "The configured proxy URL is invalid.") from None
 
 
 @dataclass(frozen=True)
@@ -155,7 +172,7 @@ class OfficialClient:
         self.cache: OrderedDict[str, tuple[float, Fetch]] = OrderedDict()
         self.lock = threading.Lock()
         self.last_request: dict[str, float] = {}
-        self.opener = urllib.request.build_opener(_SafeRedirect())
+        self.opener = urllib.request.build_opener(_CredentialFreeProxy(), _SafeRedirect())
 
     def get(self, url: str, params: dict[str, Any] | None = None, accept: str = "application/json", *, allow_atom_prefix: bool = False) -> Fetch:
         if params:

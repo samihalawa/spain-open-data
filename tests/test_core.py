@@ -165,6 +165,34 @@ class Presentation(unittest.TestCase):
         out=render({'ok':False,'error':{'code':'source_unavailable'}},'licita_search',{'name':'Test'},'markdown');self.assertIn('FUENTE NO COMPROBADA',out);self.assertNotIn('No se han encontrado coincidencias',out)
     def test_partial_label(self):
         out=render({'ok':True,'data':[],'coverage':{'partial':True}},'ayudas_shortlist',{'name':'Test'},'html');self.assertIn('RESULTADO PARCIAL',out)
+    def test_empty_partial_result_is_inconclusive_in_both_formats(self):
+        r={'ok':True,'data':[],'coverage':{'partial':True}}
+        for fmt in ('markdown','html'):
+            with self.subTest(fmt=fmt):
+                out=render(r,'ayudas_shortlist',{'name':'Test'},fmt)
+                self.assertIn('No se puede concluir que no existan coincidencias',out)
+                self.assertNotIn('No se han encontrado coincidencias',out)
+    def test_partial_errors_are_preserved_in_both_formats(self):
+        error={'code':'source_unavailable','message':'Synthetic detail failure '+('x'*1400),'source_url':'https://www.boe.es/test','date':'2026-10-20'}
+        r={'ok':True,'data':[{'bdns_number':'123','title':'Synthetic result'}],'coverage':{'partial':True},'errors':[error]}
+        for fmt in ('markdown','html'):
+            with self.subTest(fmt=fmt):
+                out=render(r,'ayudas_shortlist',{'name':'Test'},fmt)
+                for detail in error.values():self.assertIn(detail,out)
+                self.assertIn('Synthetic result',out)
+    def test_errors_without_partial_flag_do_not_claim_no_matches(self):
+        r={'ok':True,'data':[],'errors':[{'code':'source_unavailable','message':'Synthetic failure'}]}
+        for fmt in ('markdown','html'):
+            with self.subTest(fmt=fmt):
+                out=render(r,'ayudas_shortlist',{'name':'Test'},fmt)
+                self.assertIn('RESULTADO PARCIAL',out)
+                self.assertIn('No se puede concluir que no existan coincidencias',out)
+                self.assertIn('Synthetic failure',out)
+    def test_complete_empty_result_retains_no_matches_status(self):
+        for fmt in ('markdown','html'):
+            with self.subTest(fmt=fmt):
+                out=render({'ok':True,'data':[],'coverage':{'partial':False}},'ayudas_shortlist',{'name':'Test'},fmt)
+                self.assertIn('No se han encontrado coincidencias dentro del alcance consultado.',out)
     def test_source_timestamp_and_hash(self):
         r={'ok':True,'data':[],'sources':[{'url':'https://www.boe.es/test','retrieved_at':NOW,'sha256':'a'*64}]}
         out=render(r,'boe_daily',{'name':'Test'},'html');self.assertIn(NOW,out);self.assertIn('a'*16,out)

@@ -1,6 +1,6 @@
 # Example and review scenarios
 
-The captured official response in `demo.json` is a saved example, not live data. Use `python3 scripts/run.py demo` from the skill directory to replay it without network access.
+The captured official response in `demo.json` is a saved example, not live data. Call the declared `spain-open-data` MCP tool `spain_open_data_demo` to replay it without network access. Do not execute a script as a fallback.
 
 The following are review specifications, not claims of completed model-based acceptance:
 

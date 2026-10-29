@@ -6,7 +6,7 @@ p=json.loads((root/'plugin.json').read_text())
 assert p['name']==slug and p['version']==m['version']
 assert m['author']['name']=='Sami Halawa' and m['license']=='MIT'
 for k in ('documentationUrl','supportUrl','privacyPolicyUrl','termsOfServiceUrl'):
- assert m[k].startswith('https://github.com/samihalawa/'+slug+'/blob/main/')
+ assert m[k].startswith('https://github.com/samihalawa/'+slug+'/blob/release/v0.3.0-local/')
 for n in ('README.md','LICENSE','PRIVACY.md','TERMS.md','SUPPORT.md','SECURITY.md','SUBMISSION.md'):
  assert (root/n).is_file() and (root/n).stat().st_size>30
 icon=(root/'assets/icon.png').read_bytes()
@@ -17,7 +17,7 @@ r=subprocess.run([sys.executable,str(skill/'scripts/run.py'),'list'],capture_out
 assert set(json.loads(r.stdout))=={slug}
 sys.path.insert(0,str(skill/'scripts'))
 from spain_suite import core
-assert core.VERSION == p['version'] == '0.3.0'
+assert core.VERSION == p['version'] == m['version']
 assert json.loads((root/'.codex-plugin/plugin.json').read_text())['version'] == core.VERSION
 market=json.loads((root/'.claude-plugin/marketplace.json').read_text())
 assert market['metadata']['version'] == market['plugins'][0]['version'] == core.VERSION
@@ -33,3 +33,12 @@ assert not core.call_tool('ine_series',{'series_code':'IPC251852','last':999999}
 assert not (root/'.app.json').exists()
 assert not p.get('apps') and not p.get('extensions',{}).get('com.openai',{}).get('apps')
 print('PASS: package structure, identity, policies, icon, scoped CLI and five error/input guards:',slug)
+
+from spain_suite.mcp import Server
+config=json.loads((root/'.mcp.json').read_text())['mcpServers']
+assert set(config)=={slug}
+assert config[slug]['command']=='python3'
+entry='${CLAUDE_PLUGIN_ROOT}/skills/'+slug+'/scripts/mcp_server.py'
+assert config[slug]['args']==[entry]
+assert (skill/'scripts/mcp_server.py').is_file()
+assert json.loads((skill/'references/mcp-tools.json').read_text())['tools']==Server().tools()

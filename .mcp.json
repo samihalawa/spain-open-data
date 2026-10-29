@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "spain-open-data": {
+      "command": "python3",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/skills/spain-open-data/scripts/mcp_server.py"
+      ]
+    }
+  }
+}

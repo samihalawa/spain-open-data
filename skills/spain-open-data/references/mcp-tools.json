@@ -1,0 +1,149 @@
+{
+  "server": "spain-open-data",
+  "version": "0.3.1",
+  "tools": [
+    {
+      "name": "open_data_search",
+      "title": "open data search",
+      "description": "Search titles in the official datos.gob.es metadata catalog. Returns original publishers and distribution links; it does not ingest third-party datasets.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer",
+            "default": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "default": 10
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "open_data_dataset",
+      "title": "open data dataset",
+      "description": "Read one datos.gob.es dataset metadata record by its catalog slug, preserving licence and download references.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "open_data_compare",
+      "title": "open data compare",
+      "description": "Compare dataset catalog metadata and verification gaps without fetching downstream files or certifying licences.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer",
+            "default": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "default": 8
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "spain_open_data_demo",
+      "title": "Spain Open Data · ejemplo guardado",
+      "description": "Read the bundled dated example without network access. It is historical, never live.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "spain_open_data_report",
+      "title": "Spain Open Data · informe",
+      "description": "Return a deterministic Markdown, HTML or JSON report for one product operation or the saved example. Writes no files; preserve source dates and partial coverage.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "open_data_search",
+              "open_data_dataset",
+              "open_data_compare",
+              "spain_open_data_demo"
+            ]
+          },
+          "arguments": {
+            "type": "object",
+            "default": {}
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "html",
+              "json"
+            ],
+            "default": "markdown"
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

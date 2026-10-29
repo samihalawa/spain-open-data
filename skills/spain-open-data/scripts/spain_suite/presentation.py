@@ -86,14 +86,14 @@ def table_view(result: dict, tool: str):
 def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str:
     if fmt=='json':return json.dumps(result,ensure_ascii=False,indent=2)
     title=product.get('name',tool);example=result.get('example',{});sources=result.get('sources',[])
-    ok=result.get('ok') is True;partial=result.get('coverage',{}).get('partial',False)
+    ok=result.get('ok') is True;partial=bool(result.get('coverage',{}).get('partial',False) or result.get('errors'))
     label='EJEMPLO GUARDADO · no es una consulta en tiempo real' if example else 'RESULTADO PARCIAL · revisar incidencias' if partial else 'CONSULTA A FUENTES OFICIALES' if ok else 'FUENTE NO COMPROBADA'
     intro=product.get('promise','Informe con evidencia y alcance explícitos.')
     cols,rows=table_view(result,tool) if ok else ([],[])
-    status='No se han encontrado coincidencias dentro del alcance consultado.' if ok and not rows else 'La fuente no pudo comprobarse. No interpretes el error como cero resultados.' if not ok else f'{len(rows)} filas mostradas. La cobertura y las limitaciones se indican al final.'
+    status='La consulta es parcial y no muestra filas. No se puede concluir que no existan coincidencias; revisa las incidencias y la cobertura.' if ok and partial and not rows else 'No se han encontrado coincidencias dentro del alcance consultado.' if ok and not rows else 'La fuente no pudo comprobarse. No interpretes el error como cero resultados.' if not ok else f'{len(rows)} filas mostradas. La cobertura y las limitaciones se indican al final.'
     if fmt=='html':
         parts=['<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+html.escape(title)+' · Informe</title><style>'+CSS+'</style><body><main><header><div class="eyebrow">'+html.escape(title)+' / EVIDENCIA</div><h1>'+html.escape(title)+'</h1><p>'+html.escape(intro)+'</p><p class="badge">'+html.escape(label)+'</p></header><p class="notice">'+html.escape(status)+'</p>']
-        if example:parts.append('<p>Captura: '+html.escape(value(example.get('captured_at')))+'. Puedes reproducirla sin conexión con <code>demo</code>. Para datos actuales, ejecuta <code>report</code>.</p>')
+        if example:parts.append('<p>Captura: '+html.escape(value(example.get('captured_at')))+'. Reproduce el ejemplo con la herramienta de demostración del MCP declarado. Para datos actuales, solicita una consulta a ese MCP.</p>')
         if not ok:parts.append('<pre class="error">'+html.escape(json.dumps(result.get('error',{}),ensure_ascii=False,indent=2))+'</pre>')
         if rows:
             parts.append('<div class="scroll"><table><caption class="muted">Datos publicados; los textos extensos se abrevian en la tabla.</caption><thead><tr>'+''.join('<th scope="col">'+html.escape(c)+'</th>' for c in cols)+'</tr></thead><tbody>')
@@ -121,6 +121,7 @@ def render(result: dict, tool: str, product: dict, fmt: str = 'markdown') -> str
     parts+=['','## Fuentes','']
     for source in sources:parts+=['- '+cell(source.get('url'),'markdown')+' · Consulta: '+value(source.get('retrieved_at'))+(' · Solo prefijo de respuesta: incompleta' if source.get('complete') is False else '')]
     parts+=['','## Alcance','', '    '+json.dumps(result.get('coverage',{}),ensure_ascii=False,indent=2).replace('\n','\n    ') ]
+    if result.get('errors'):parts+=['','## Incidencias de la consulta','', '    '+json.dumps(result['errors'],ensure_ascii=False,indent=2).replace('\n','\n    ')]
     parts+=['','## Límites y comprobaciones','']+[ '- '+html.escape(str(w)) for w in result.get('warnings',[]) ]
     parts+=['','Software independiente de Sami Halawa. Conserva el JSON para inspeccionar todos los campos y textos completos.']
     return '\n'.join(parts)+'\n'
