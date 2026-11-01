@@ -1,5 +1,7 @@
-# Terms of the distributed software
+# Condiciones del paquete distribuido
 
-The code and accompanying original documentation are distributed under the included MIT licence, including its warranty disclaimer. Third-party data, service access, trademarks and dataset licences are not licensed by that grant. Follow each original provider’s reuse and access conditions.
+La documentación original y los materiales originales incluidos se distribuyen bajo la licencia MIT adjunta, con su exclusión de garantías. Ese permiso no licencia datos, publicaciones, marcas o servicios de terceros: respeta las condiciones de cada fuente y del anfitrión.
 
-This is an independent informational tool, not an official service, professional legal opinion, certification or promise of funding. Verify consequential decisions with the authoritative source and an appropriately qualified adviser where needed. No fee, subscription, checkout or purchase functionality is implemented. No additional contractual service commitment or support response time is asserted by this file.
+Esta habilidad ofrece instrucciones informativas, no un servicio oficial, opinión profesional, certificación o garantía de resultados. Verifica las decisiones importantes con las fuentes pertinentes y, cuando corresponda, con un profesional cualificado. La disponibilidad y el comportamiento de la navegación, lectura y exportación nativas dependen del anfitrión y de sus permisos.
+
+El paquete no implementa cuotas, suscripciones, compras o pagos ni afirma un compromiso adicional de disponibilidad o tiempo de respuesta de soporte. Los posibles costes del anfitrión son independientes. No está afiliado a las administraciones cuyas publicaciones ayuda a consultar.

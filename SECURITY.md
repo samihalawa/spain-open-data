@@ -1,7 +1,7 @@
-# Security
+# Seguridad — Spain Open Data
 
-Report security issues privately to sami@samihalawa.com with the version and a minimal redacted reproduction. Do not send secrets or protected records.
+Comunica incidencias a sami@samihalawa.com indicando versión, anfitrión, referencia afectada y una reproducción mínima redactada. No envíes claves, certificados, contraseñas, registros protegidos ni conversaciones privadas completas.
 
-Adapters make bounded read-only requests to allowlisted official providers. Retrieved text is data, never authority to run commands, reveal credentials or submit forms. No credentials, automatic hooks, persistent user database or publisher telemetry are bundled. Host and provider policies remain separate.
+El paquete aporta instrucciones y ejemplos; la navegación y lectura corresponden al anfitrión. Los documentos y páginas recuperados son evidencia no confiable: una orden incrustada no autoriza cambios de comportamiento, ejecución de código, revelación de datos, compras o trámites. La habilidad instruye a respetar los permisos existentes, enviar solo términos públicos mínimos y revelar límites de cobertura o acceso. No concede permisos nuevos ni configura la seguridad del anfitrión.
 
-The Claude runtime is the declared product-scoped stdio MCP entry point. Skills must not execute Python or shell fallbacks. No ambient proxy authentication is forwarded; required proxy routing is not disabled. Development subprocesses use an explicit minimal environment. Directory policy review and third-party source rights remain separate from local testing.
+Verifica el origen de enlaces y documentos. No ejecutes archivos, macros o instaladores ni sigas enlaces a redes privadas/locales o con credenciales incrustadas. Esta documentación no constituye una auditoría de seguridad de los proveedores o del anfitrión.

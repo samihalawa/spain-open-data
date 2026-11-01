@@ -15,12 +15,12 @@
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/logo.png",
-    "longDescription": "Find and compare Spanish public datasets by licence metadata, freshness and usable access links.\n\nUse bounded read-only official-source queries, a clearly dated offline example, and source-linked Markdown, HTML or JSON reports. Review returned dates, identifiers, provenance, errors and unexamined coverage before acting. No official affiliation, eligibility, legal, title, solvency or reuse-rights certification is claimed.\n\nRuns a bundled local stdio MCP on compatible desktop hosts with Python 3.11+ and authorized network access. No API key, account, dependency installation, hosted publisher service, telemetry or purchase functionality is provided. Reports return text without writing files. An unavailable local server is disclosed; scripts are never an execution fallback. This package does not create a web/mobile remote connection.",
+    "longDescription": "Find and compare Spanish public datasets by licence metadata, freshness and usable access links.\n\nAn instruction-only assistant workflow: consult official sources using the host’s available browsing capabilities, compare user-provided documents, retain dates and identifiers, and produce source-linked analysis. A labelled historical example is included.\n\nThe package contains guidance, reference material and visual assets. Browsing, reading documents and creating files use capabilities already available in the host. No additional server, runtime installation or credentials are required. Source access and complete coverage must be verified for each task; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
     "shortDescription": "Find reusable Spanish datasets",
     "websiteURL": "https://samihalawa.github.io/spain-open-data/",
-    "supportURL": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/SUPPORT.md",
-    "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/PRIVACY.md",
-    "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/release/v0.3.0-local/TERMS.md"
+    "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
+    "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
   },
   "keywords": [
     "spain",
@@ -34,8 +34,6 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.4.0",
-  "homepage": "https://samihalawa.github.io/spain-open-data/",
-  "requires_local_executor": true,
-  "mcpServers": "./mcp.json"
+  "version": "0.5.0",
+  "homepage": "https://samihalawa.github.io/spain-open-data/"
 }

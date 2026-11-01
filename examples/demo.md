@@ -1,5 +1,7 @@
 # Spain Open Data
 
+Documento histórico conservado. La versión 0.5.0 aporta instrucciones; leer esta muestra no ejecuta ni actualiza la consulta original.
+
 Encuentra el dataset. Comprueba si te sirve.
 
 > EJEMPLO GUARDADO · no es una consulta en tiempo real

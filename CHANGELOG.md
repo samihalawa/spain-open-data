@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Instruction-only skills and reference material, using host-native browsing/documents.
+- Removed bundled local MCP, Python execution, runtime configuration and Docker distribution from the current plugin.
+- Preserved official-source evidence rules, dated historical examples and generated flag-accent branding.
+- Earlier executable releases remain historical versions in Git history.
+
 ## 0.4.0
 
 - Add portable local MCP and a Codex marketplace without removing the Claude configuration.
