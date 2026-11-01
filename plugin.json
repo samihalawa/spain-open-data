@@ -80,7 +80,8 @@
               "prompt": "Publica mi base de datos privada en datos.gob.es."
             }
           ]
-        }
+        },
+        "demo_recording_url": "https://github.com/samihalawa/spain-assistant-mcp-apps/releases/download/v0.6.1/spain-hosted-demo.mp4"
       },
       "publication": {
         "release_notes": "0.6.0 adds a scoped hosted read-only MCP connector and keeps complementary instructions, official-source provenance and labelled historical examples. Earlier 0.5.0 instruction-only history is preserved. No local runtime is installed.",

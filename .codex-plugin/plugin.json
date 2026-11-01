@@ -35,5 +35,12 @@
   "name": "spain-open-data",
   "skills": "./skills",
   "version": "0.6.0",
-  "homepage": "https://samihalawa.github.io/spain-open-data/"
+  "homepage": "https://samihalawa.github.io/spain-open-data/",
+  "extensions": {
+    "com.openai": {
+      "review": {
+        "demo_recording_url": "https://github.com/samihalawa/spain-assistant-mcp-apps/releases/download/v0.6.1/spain-hosted-demo.mp4"
+      }
+    }
+  }
 }
