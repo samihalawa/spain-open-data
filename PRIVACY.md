@@ -1,11 +1,11 @@
-# Privacidad — Spain Open Data 0.5.0
+# Privacidad — Spain Open Data 0.6.0
 
-Este paquete contiene instrucciones, referencias y ejemplos históricos. No ejecuta un servicio de consulta propio, no implementa una caché, no recopila conversaciones y no incorpora un sistema de cuentas, analítica o pagos. El asistente utiliza las herramientas nativas que el anfitrión tenga autorizadas.
+Editor y operador del conector: Sami Halawa. Contacto: sami@samihalawa.com.
 
-Si el anfitrión navega a una fuente pública, ese proveedor puede recibir los términos de búsqueda, identificadores y dirección de red de la consulta, de acuerdo con sus prácticas. La habilidad indica usar solo los términos o identificadores públicos mínimos, sin enviar contraseñas, conversaciones completas, perfiles personales o adjuntos como consultas. No configura ni controla el transporte, autenticación, registros o retención del anfitrión o del proveedor.
+El anfitrión envía por HTTPS los argumentos necesarios a `https://aiplugins.megawebs.com/mcp/spain-open-data`. El servicio recibe términos de búsqueda, identificadores públicos, filtros y metadatos técnicos de conexión. Consulta proveedores oficiales para responder; esos proveedores reciben las consultas y la dirección de red del servicio según sus propias prácticas. No envíes contraseñas, conversaciones completas, documentos privados ni datos personales innecesarios como argumentos.
 
-Los documentos aportados, respuestas del asistente y archivos que el usuario pida guardar se conservan según el anfitrión y las elecciones del usuario. La habilidad no afirma controlar esa conservación. Los registros públicos pueden contener datos personales y condiciones propias de acceso o reutilización. Comprueba las fuentes y evita divulgar información innecesaria.
+El código del conector ejecuta consultas públicas de solo lectura. No incorpora cuentas de usuario, pagos, analítica publicitaria ni una base de datos de conversaciones. El adaptador puede mantener temporalmente respuestas de fuentes en memoria durante su ejecución; no configura una caché de consultas en disco. El alojamiento, proxy y proveedores pueden conservar registros técnicos según su configuración y políticas. No se afirma un plazo de borrado ni ausencia de registros en esos sistemas.
 
-La captura guardada es una muestra histórica de registros públicos, no un documento privado del usuario ni prueba de datos actuales. La página de muestra solo filtra o exporta la muestra visible; no consulta fuentes públicas al cargarla. Las páginas estáticas no incluyen un sistema de cuentas o analítica del editor. Si se sirven en GitHub Pages, GitHub proporciona el alojamiento y puede tratar registros de conexión bajo sus políticas.
+El anfitrión conserva conversaciones, documentos, respuestas y archivos según sus propias opciones. El conector no controla esa conservación. Para una consulta sobre datos procesados por el servicio, escribe al contacto indicado con un ejemplo mínimo y sin secretos; para datos conservados por el anfitrión o una fuente oficial, utiliza sus canales correspondientes.
 
-Editor: Sami Halawa. Consultas sobre el paquete: sami@samihalawa.com. No envíes secretos o documentos protegidos al pedir ayuda.
+Los registros oficiales pueden contener datos personales públicos y condiciones de reutilización. Comparte solo lo pertinente. Los ejemplos incluidos son históricos. Las páginas estáticas del paquete no incorporan cuentas ni analítica del editor; GitHub Pages, cuando las aloja, aplica sus propias políticas de conexión.

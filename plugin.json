@@ -4,7 +4,7 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
+  "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
   "extensions": {
     "com.openai": {
       "interface": {
@@ -18,7 +18,7 @@
         "developerName": "Sami Halawa",
         "displayName": "Spain Open Data",
         "logo": "./assets/logo.png",
-        "longDescription": "Find and compare Spanish public datasets by licence metadata, freshness and usable access links.\n\nAn instruction-only assistant workflow: consult official sources using the host’s available browsing capabilities, compare user-provided documents, retain dates and identifiers, and produce source-linked analysis. A labelled historical example is included.\n\nThe package contains guidance, reference material and visual assets. Browsing, reading documents and creating files use capabilities already available in the host. No additional server, runtime installation or credentials are required. Source access and complete coverage must be verified for each task; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
+        "longDescription": "Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected.\n\nConnects to a hosted, read-only MCP tool for official Spanish public-source queries. Complementary instructions guide source checks, document reading and interpretation using the host’s authorized capabilities. Results retain available provenance, dates, warnings and partial coverage. No local Python installation or publisher API key is required.\n\nThe tool does not submit applications, sign documents, make purchases, access protected records or start background monitoring. A historical example remains labelled as such. Source availability and complete coverage must be verified for each query; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
         "shortDescription": "Find reusable Spanish datasets",
         "websiteURL": "https://samihalawa.github.io/spain-open-data/",
         "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
@@ -27,19 +27,67 @@
       },
       "review": {
         "prompts": [
-          "Busca datasets de empleo y compáralos por formato, licencia y fecha.",
-          "Encuentra datos de mi municipio y distingue catálogo, descarga e inspección real.",
-          "Muéstrame un ejemplo y qué comprobar antes de reutilizar los datos."
+          "Busca datasets de vivienda en datos.gob.es con hasta seis registros.",
+          "Busca datasets de movilidad en la página 1 con hasta cuatro registros.",
+          "Busca hasta doce datasets de empleo y compara formatos y publicadores."
         ],
         "commerce": false,
-        "commerce_description": "Instruction-only guidance; no checkout, payment or purchase functionality."
+        "commerce_description": "Read-only official-source queries and assistant guidance; no checkout, payment or purchase functionality.",
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Public-source query; no account or fixture upload required. Distinct input/boundary variant 1.",
+              "prompt": "Busca datasets de vivienda en datos.gob.es con hasta seis registros.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+            },
+            {
+              "description": "Public-source query; no account or fixture upload required. Distinct input/boundary variant 2.",
+              "prompt": "Busca datasets de movilidad en la página 1 con hasta cuatro registros.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+            },
+            {
+              "description": "Public-source query; no account or fixture upload required. Distinct input/boundary variant 3.",
+              "prompt": "Busca hasta doce datasets de empleo y compara formatos y publicadores.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+            },
+            {
+              "description": "Public-source query; no account or fixture upload required. Distinct input/boundary variant 4.",
+              "prompt": "Busca datasets de energía y señala licencias ausentes o pendientes.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+            },
+            {
+              "description": "Public-source query; no account or fixture upload required. Distinct input/boundary variant 5.",
+              "prompt": "Busca datasets de vivienda y distingue metadatos del catálogo de archivos realmente descargados.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+              "prompt": "Descarga e inspecciona todos los archivos de estos datasets con esta herramienta."
+            },
+            {
+              "description": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+              "prompt": "Garantiza que cualquier dataset puede reutilizarse sin condiciones."
+            },
+            {
+              "description": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+              "prompt": "Publica mi base de datos privada en datos.gob.es."
+            }
+          ]
+        }
       },
       "publication": {
-        "release_notes": "0.5.0 converts the plugin to instruction-only guidance and references. Removes the local MCP, executable adapters and runtime requirements while preserving product identity, official-source workflows, historical examples and generated Spanish-flag icons.",
+        "release_notes": "0.6.0 adds a scoped hosted read-only MCP connector and keeps complementary instructions, official-source provenance and labelled historical examples. Earlier 0.5.0 instruction-only history is preserved. No local runtime is installed.",
         "translations": {
           "es-ES": {
             "subtitle": "Datasets listos para evaluar",
-            "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.\n\nGuía de instrucciones para consultar fuentes oficiales con las capacidades disponibles del asistente y analizar documentos aportados por el usuario. Conserva fechas, identificadores, enlaces y límites de cobertura. Incluye un ejemplo histórico claramente identificado.\n\nNo requiere instalar servidores, Python ni herramientas propias. La navegación y la creación de archivos dependen del anfitrión. No implica afiliación oficial ni garantiza resultados o conclusiones jurídicas."
+            "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.\n\nConector MCP alojado para consultas públicas de solo lectura, con instrucciones complementarias para revisar fuentes y documentos. Conserva fechas, identificadores, enlaces y límites. No requiere Python local ni claves del editor. No presenta trámites, firma, compra, accede a datos protegidos ni activa vigilancia. Los ejemplos guardados son históricos."
           }
         }
       }
@@ -56,7 +104,7 @@
   ],
   "license": "MIT",
   "name": "spain-open-data",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "homepage": "https://samihalawa.github.io/spain-open-data/",
   "repository": "https://github.com/samihalawa/spain-open-data"
 }

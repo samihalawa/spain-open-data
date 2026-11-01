@@ -9,7 +9,7 @@ Encuentra el dataset. Comprueba si te sirve. Encuentra datasets españoles y com
 
 ## Cómo trabajar
 
-Esta habilidad aporta instrucciones y referencias. Usa exclusivamente la navegación, búsqueda, lectura de archivos y presentación nativas que el anfitrión tenga autorizadas para la petición. La instalación no concede acceso adicional. No requiere ni inicia herramientas personalizadas, servidores, procesos locales, comandos, intérpretes o dependencias.
+Esta edición 0.6.0 incluye el conector MCP alojado `compare_spanish_open_datasets` en `https://aiplugins.megawebs.com/mcp/spain-open-data`. Úsalo para su consulta pública de solo lectura: Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones. Aplica después las instrucciones para interpretar resultados y revisar documentos con las capacidades autorizadas del anfitrión. No requiere procesos locales, Python ni claves del editor. Envía solo argumentos públicos mínimos, nunca conversaciones completas, documentos privados ni credenciales.
 
 Busca en datos.gob.es y contrasta los candidatos con su publicador original. Separa los metadatos del catálogo de una distribución realmente abierta e inspeccionada.
 

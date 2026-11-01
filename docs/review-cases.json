@@ -1,0 +1,80 @@
+{
+  "version": "0.6.0",
+  "endpoint": "https://aiplugins.megawebs.com/mcp/spain-open-data",
+  "status": "not_run",
+  "scope": "Input mapping for real scoped MCP calls. Direct protocol execution proves tool behavior only; semantic no-tool negative cases require an actual assistant session. Repeated arguments deliberately assess distinct output interpretation, not additional unique runtime inputs.",
+  "positive": [
+    {
+      "id": "positive-1",
+      "prompt": "Busca datasets de vivienda en datos.gob.es con hasta seis registros.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "vivienda",
+        "page_size": 6
+      },
+      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+    },
+    {
+      "id": "positive-2",
+      "prompt": "Busca datasets de movilidad en la página 1 con hasta cuatro registros.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "movilidad",
+        "page": 1,
+        "page_size": 4
+      },
+      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+    },
+    {
+      "id": "positive-3",
+      "prompt": "Busca hasta doce datasets de empleo y compara formatos y publicadores.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "empleo",
+        "page_size": 12
+      },
+      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+    },
+    {
+      "id": "positive-4",
+      "prompt": "Busca datasets de energía y señala licencias ausentes o pendientes.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "energía"
+      },
+      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+    },
+    {
+      "id": "positive-5",
+      "prompt": "Busca datasets de vivienda y distingue metadatos del catálogo de archivos realmente descargados.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "vivienda"
+      },
+      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+    }
+  ],
+  "negative": [
+    {
+      "id": "negative-1",
+      "prompt": "Descarga e inspecciona todos los archivos de estos datasets con esta herramienta.",
+      "prohibited_tool": "compare_spanish_open_datasets",
+      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+      "status": "not_run"
+    },
+    {
+      "id": "negative-2",
+      "prompt": "Garantiza que cualquier dataset puede reutilizarse sin condiciones.",
+      "prohibited_tool": "compare_spanish_open_datasets",
+      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+      "status": "not_run"
+    },
+    {
+      "id": "negative-3",
+      "prompt": "Publica mi base de datos privada en datos.gob.es.",
+      "prohibited_tool": "compare_spanish_open_datasets",
+      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion.",
+      "status": "not_run"
+    }
+  ]
+}

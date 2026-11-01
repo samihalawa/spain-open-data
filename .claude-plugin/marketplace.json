@@ -5,15 +5,15 @@
     "email": "sami@samihalawa.com"
   },
   "metadata": {
-    "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
-    "version": "0.5.0"
+    "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
+    "version": "0.6.0"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
-      "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
-      "version": "0.5.0"
+      "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
+      "version": "0.6.0"
     }
   ]
 }

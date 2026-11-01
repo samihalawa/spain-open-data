@@ -2,7 +2,7 @@
   "name": "Spain Open Data",
   "promise": "Encuentra el dataset. Comprueba si te sirve.",
   "audience": "Desarrolladores y equipos que buscan datos públicos reutilizables.",
-  "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
+  "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
   "short": "Datasets listos para evaluar",
   "source": "datos.gob.es",
   "keywords": [
@@ -24,7 +24,7 @@
   ],
   "limits": "No garantiza que una descarga o licencia siga vigente. La fecha del catálogo no equivale al periodo del dato. No ejecuta archivos, macros o código, ni acredita reutilización a partir de metadatos incompletos.",
   "slug": "spain-open-data",
-  "version": "0.5.0",
-  "guidance": "Busca en datos.gob.es y contrasta los candidatos con su publicador original. Separa los metadatos del catálogo de una distribución realmente abierta e inspeccionada.",
-  "mode": "instructions-only"
+  "version": "0.6.0",
+  "guidance": "Consulta pública con conector MCP alojado e instrucciones complementarias; conserva fuentes, fechas y cobertura real.",
+  "mode": "hosted-read-only-mcp-with-guidance"
 }

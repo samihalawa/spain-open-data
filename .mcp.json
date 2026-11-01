@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "spain-open-data": {
+      "type": "http",
+      "url": "https://aiplugins.megawebs.com/mcp/spain-open-data"
+    }
+  }
+}

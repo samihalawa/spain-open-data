@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Añade un conector MCP remoto de solo lectura, acotado al dominio.
+- Mantiene instrucciones complementarias y procedencia de ejemplos históricos.
+- Actualiza privacidad, metadatos y casos de revisión; no requiere Python local.
+
 ## 0.5.0
 
 - Instruction-only skills and reference material, using host-native browsing/documents.

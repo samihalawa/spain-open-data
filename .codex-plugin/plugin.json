@@ -3,7 +3,7 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.",
+  "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
   "interface": {
     "capabilities": [],
     "category": "Productivity",
@@ -15,7 +15,7 @@
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/logo.png",
-    "longDescription": "Find and compare Spanish public datasets by licence metadata, freshness and usable access links.\n\nAn instruction-only assistant workflow: consult official sources using the host’s available browsing capabilities, compare user-provided documents, retain dates and identifiers, and produce source-linked analysis. A labelled historical example is included.\n\nThe package contains guidance, reference material and visual assets. Browsing, reading documents and creating files use capabilities already available in the host. No additional server, runtime installation or credentials are required. Source access and complete coverage must be verified for each task; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
+    "longDescription": "Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected.\n\nConnects to a hosted, read-only MCP tool for official Spanish public-source queries. Complementary instructions guide source checks, document reading and interpretation using the host’s authorized capabilities. Results retain available provenance, dates, warnings and partial coverage. No local Python installation or publisher API key is required.\n\nThe tool does not submit applications, sign documents, make purchases, access protected records or start background monitoring. A historical example remains labelled as such. Source availability and complete coverage must be verified for each query; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
     "shortDescription": "Find reusable Spanish datasets",
     "websiteURL": "https://samihalawa.github.io/spain-open-data/",
     "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
@@ -34,6 +34,6 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "homepage": "https://samihalawa.github.io/spain-open-data/"
 }

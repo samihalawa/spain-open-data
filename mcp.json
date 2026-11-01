@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "spain-open-data": {
+      "type": "streamable-http",
+      "url": "https://aiplugins.megawebs.com/mcp/spain-open-data"
+    }
+  }
+}
