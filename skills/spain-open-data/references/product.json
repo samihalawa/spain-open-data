@@ -24,7 +24,7 @@
   ],
   "limits": "No garantiza que una descarga o licencia siga vigente. La fecha del catálogo no equivale al periodo del dato. No ejecuta archivos, macros o código, ni acredita reutilización a partir de metadatos incompletos.",
   "slug": "spain-open-data",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "guidance": "Consulta pública con conector MCP alojado e instrucciones complementarias; conserva fuentes, fechas y cobertura real.",
   "mode": "hosted-read-only-mcp-with-guidance"
 }

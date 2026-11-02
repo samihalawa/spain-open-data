@@ -1,4 +1,4 @@
-# Privacidad — Spain Open Data 0.6.0
+# Privacidad — Spain Open Data 0.6.2
 
 Editor y operador del conector: Sami Halawa. Contacto: sami@samihalawa.com.
 
@@ -8,4 +8,4 @@ El código del conector ejecuta consultas públicas de solo lectura. No incorpor
 
 El anfitrión conserva conversaciones, documentos, respuestas y archivos según sus propias opciones. El conector no controla esa conservación. Para una consulta sobre datos procesados por el servicio, escribe al contacto indicado con un ejemplo mínimo y sin secretos; para datos conservados por el anfitrión o una fuente oficial, utiliza sus canales correspondientes.
 
-Los registros oficiales pueden contener datos personales públicos y condiciones de reutilización. Comparte solo lo pertinente. Los ejemplos incluidos son históricos. Las páginas estáticas del paquete no incorporan cuentas ni analítica del editor; GitHub Pages, cuando las aloja, aplica sus propias políticas de conexión.
+Los registros oficiales pueden contener datos personales públicos y condiciones de reutilización. Comparte solo lo pertinente. Los ejemplos incluidos son históricos. Las páginas del producto y sus políticas se publican en aiplugins.megawebs.com.

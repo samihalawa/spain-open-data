@@ -1,58 +1,40 @@
-# Changelog
+# Historial de versiones
+
+## 0.6.2
+
+- Centraliza las páginas del producto, privacidad, condiciones y soporte en Megawebs Plugins. Las consultas y herramientas no cambian.
 
 ## 0.6.0
 
-- Añade un conector MCP remoto de solo lectura, acotado al dominio.
-- Mantiene instrucciones complementarias y procedencia de ejemplos históricos.
-- Actualiza privacidad, metadatos y casos de revisión; no requiere Python local.
+- Añade un conector MCP remoto de solo lectura para la consulta del producto.
+- Conserva instrucciones complementarias y ejemplos históricos identificados como tales.
+- No requiere Python local ni claves del editor.
 
 ## 0.5.0
 
-- Instruction-only skills and reference material, using host-native browsing/documents.
-- Removed bundled local MCP, Python execution, runtime configuration and Docker distribution from the current plugin.
-- Preserved official-source evidence rules, dated historical examples and generated flag-accent branding.
-- Earlier executable releases remain historical versions in Git history.
+- Ofrece instrucciones y material de referencia para trabajar con la navegación y los documentos del asistente.
+- Retira del paquete el servidor MCP local y sus dependencias de ejecución.
 
 ## 0.4.0
 
-- Add portable local MCP and a Codex marketplace without removing the Claude configuration.
-- Replace letter marks with distinct generated symbols and a small Spanish flag at the border.
-- Synchronize desktop instructions, English base/Spanish listing metadata, review specifications and release notes.
-- Preserve upstream marketplace positioning and reconcile the documentary preview conflict.
-- Public directory approval, local-MCP partner eligibility and model-based review remain separate from package tests.
+- Añade un MCP local portátil y compatibilidad con el catálogo de Codex, conservando la configuración de Claude.
+- Actualiza los iconos y las instrucciones de uso.
 
 ## 0.3.1
 
-- Declare a product-scoped local MCP with bounded JSON-RPC framing, dated demos and deterministic report text.
-- Keep skill execution inside that declared MCP; retain the separate developer CLI.
-- Reject ambient proxy credentials without disabling proxy routing or TLS.
-- Use minimal test subprocess environments; clarify runtime, privacy and unresolved directory-policy claims.
-
+- Incluye un conector local específico del producto, ejemplos fechados e informes de texto.
+- Mejora el manejo de conexiones, errores y credenciales de proxy.
 
 ## 0.3.0 — 2026-10-20
 
-**Critique:** Una lista de enlaces se parecía demasiado a una búsqueda genérica. Faltaba una ficha útil y el identificador explícito para continuar.
-
-**Improvement:** La nueva función open_data_compare lleva al usuario a una salida más directamente utilizable; Fichas comparables, identificadores de dataset y errores de esquema explícitos, con checklist de reutilización.
-
-Bounded PLACSP fallback: retain at most 8 MiB, parse only complete prefix entries, identify prefix hashes and unread entries/tombstones, and block continuation before the unread suffix. The general fetch limit remains unchanged.
-
-Shared changes: Spanish-first outcome-led onboarding; offline official-source snapshots explicitly labelled as examples; readable Markdown and print-friendly HTML; `doctor`; bounded input and overwrite protection; escaped report content; safer XML; explicit source/TLS errors; pagination and parser regression tests.
-
-No adoption uplift, model-based acceptance, hosted MCP service, active CI or official directory approval is claimed.
-
-Local completion: synchronized package/runtime/tool contracts; dataset distributions without a usable URL retain their missing-link warning; all seven workflows receive regression coverage; documentary design with historical-data labels and functional filtering.
+- Agrupa fichas de datasets con sus identificadores y comprobaciones de reutilización.
+- Añade informes Markdown y HTML y conserva los enlaces de las fuentes y las etiquetas de datos históricos.
 
 ## 0.2.0 — 2026-10-20
 
-**Critique:** Una lista de enlaces se parecía demasiado a una búsqueda genérica. Faltaba una ficha útil y el identificador explícito para continuar.
-
-**Improvement:** Fichas comparables, identificadores de dataset y errores de esquema explícitos, con checklist de reutilización.
-
-Shared changes: Spanish-first outcome-led onboarding; offline official-source snapshots explicitly labelled as examples; readable Markdown and print-friendly HTML; `doctor`; bounded input and overwrite protection; escaped report content; safer XML; explicit source/TLS errors; pagination and parser regression tests.
-
-No adoption uplift, model-based acceptance, hosted MCP service, active CI or official directory approval is claimed.
+- Presenta fichas comparables, identificadores de dataset y errores de esquema explícitos.
+- Mejora las instrucciones en español y los informes legibles con fuentes.
 
 ## 0.1.2
 
-Initial standalone public package. Earlier verification remains historical evidence, not proof of this new release.
+- Primera versión del paquete independiente.

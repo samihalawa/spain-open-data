@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.2",
   "endpoint": "https://aiplugins.megawebs.com/mcp/spain-open-data",
   "scope": "Specification of positive inputs and expected behavior, and unsupported negative requests. This JSON defines cases and is not an execution log. Direct MCP calls and the SDK demo verify tool behavior; the demo does not test assistant routing. Actual native assistant test evidence is retained in the native release records.",
   "positive": [

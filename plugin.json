@@ -20,10 +20,10 @@
         "logo": "./assets/logo.png",
         "longDescription": "Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected.\n\nConnects to a hosted, read-only MCP tool for official Spanish public-source queries. Complementary instructions guide source checks, document reading and interpretation using the host’s authorized capabilities. Results retain available provenance, dates, warnings and partial coverage. No local Python installation or publisher API key is required.\n\nThe tool does not submit applications, sign documents, make purchases, access protected records or start background monitoring. A historical example remains labelled as such. Source availability and complete coverage must be verified for each query; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
         "shortDescription": "Find reusable Spanish datasets",
-        "websiteURL": "https://samihalawa.github.io/spain-open-data/",
-        "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
-        "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
-        "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
+        "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
+        "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
+        "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
+        "termsOfServiceURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/terms"
       },
       "review": {
         "prompts": [
@@ -84,7 +84,7 @@
         "demo_recording_url": "https://github.com/samihalawa/spain-assistant-mcp-apps/releases/download/v0.6.1/spain-hosted-demo.mp4"
       },
       "publication": {
-        "release_notes": "0.6.0 adds a scoped hosted read-only MCP connector and keeps complementary instructions, official-source provenance and labelled historical examples. Earlier 0.5.0 instruction-only history is preserved. No local runtime is installed.",
+        "release_notes": "0.6.2 moves product, privacy, terms and support pages to the unified Megawebs Plugins website. The hosted read-only tools and their behavior are unchanged.",
         "translations": {
           "es-ES": {
             "subtitle": "Datasets listos para evaluar",
@@ -105,7 +105,7 @@
   ],
   "license": "MIT",
   "name": "spain-open-data",
-  "version": "0.6.0",
-  "homepage": "https://samihalawa.github.io/spain-open-data/",
+  "version": "0.6.2",
+  "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "repository": "https://github.com/samihalawa/spain-open-data"
 }

@@ -17,10 +17,10 @@
     "logo": "./assets/logo.png",
     "longDescription": "Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected.\n\nConnects to a hosted, read-only MCP tool for official Spanish public-source queries. Complementary instructions guide source checks, document reading and interpretation using the host’s authorized capabilities. Results retain available provenance, dates, warnings and partial coverage. No local Python installation or publisher API key is required.\n\nThe tool does not submit applications, sign documents, make purchases, access protected records or start background monitoring. A historical example remains labelled as such. Source availability and complete coverage must be verified for each query; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
     "shortDescription": "Find reusable Spanish datasets",
-    "websiteURL": "https://samihalawa.github.io/spain-open-data/",
-    "supportURL": "https://github.com/samihalawa/spain-open-data/blob/main/SUPPORT.md",
-    "privacyPolicyURL": "https://github.com/samihalawa/spain-open-data/blob/main/PRIVACY.md",
-    "termsOfServiceURL": "https://github.com/samihalawa/spain-open-data/blob/main/TERMS.md"
+    "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
+    "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
+    "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
+    "termsOfServiceURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/terms"
   },
   "keywords": [
     "spain",
@@ -34,8 +34,8 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.6.0",
-  "homepage": "https://samihalawa.github.io/spain-open-data/",
+  "version": "0.6.2",
+  "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "extensions": {
     "com.openai": {
       "review": {

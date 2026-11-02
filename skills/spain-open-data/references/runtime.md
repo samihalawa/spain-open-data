@@ -1,4 +1,4 @@
-# Acceso al conector — Spain Open Data 0.6.0
+# Acceso al conector — Spain Open Data 0.6.2
 
 Endpoint MCP Streamable HTTP: `https://aiplugins.megawebs.com/mcp/spain-open-data`. Herramienta: `compare_spanish_open_datasets`. Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.
 

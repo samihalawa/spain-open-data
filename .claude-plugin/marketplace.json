@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
-    "version": "0.6.0"
+    "version": "0.6.2"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
       "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
-      "version": "0.6.0"
+      "version": "0.6.2"
     }
   ]
 }
