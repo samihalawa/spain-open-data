@@ -1,5 +1,10 @@
 # Historial de versiones
 
+## 0.6.3
+
+- Precisa los ejemplos de búsqueda y los resultados esperados para la revisión.
+- Retira la imagen repetida del README. Los iconos del paquete siguen declarados en el manifiesto.
+
 ## 0.6.2
 
 - Centraliza las páginas del producto, privacidad, condiciones y soporte en Megawebs Plugins. Las consultas y herramientas no cambian.

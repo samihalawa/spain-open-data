@@ -1,56 +1,59 @@
 {
-  "version": "0.6.2",
+  "version": "0.6.3",
   "endpoint": "https://aiplugins.megawebs.com/mcp/spain-open-data",
   "scope": "Specification of positive inputs and expected behavior, and unsupported negative requests. This JSON defines cases and is not an execution log. Direct MCP calls and the SDK demo verify tool behavior; the demo does not test assistant routing. Actual native assistant test evidence is retained in the native release records.",
   "positive": [
     {
       "id": "positive-1",
-      "prompt": "Busca datasets de vivienda en datos.gob.es con hasta seis registros.",
+      "prompt": "Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.",
       "tool": "compare_spanish_open_datasets",
       "arguments": {
         "query": "vivienda",
+        "page": 0,
         "page_size": 6
       },
-      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+      "expected_behavior": "Return at most six catalog records with title, listed publisher and catalog link when available, and identify the checked page. If the source fails or coverage is partial, explain what could be checked."
     },
     {
       "id": "positive-2",
-      "prompt": "Busca datasets de movilidad en la página 1 con hasta cuatro registros.",
+      "prompt": "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
       "tool": "compare_spanish_open_datasets",
       "arguments": {
         "query": "movilidad",
         "page": 1,
         "page_size": 4
       },
-      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+      "expected_behavior": "Use page index 1 and return at most four records. State the page index and report any returned continuation. If the source fails or coverage is partial, explain what could be checked."
     },
     {
       "id": "positive-3",
-      "prompt": "Busca hasta doce datasets de empleo y compara formatos y publicadores.",
+      "prompt": "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo.",
       "tool": "compare_spanish_open_datasets",
       "arguments": {
         "query": "empleo",
         "page_size": 12
       },
-      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+      "expected_behavior": "Compare the declared publishers and formats for up to twelve records. Identify unknown fields and retain the catalog links. If the source fails or coverage is partial, explain what could be checked."
     },
     {
       "id": "positive-4",
-      "prompt": "Busca datasets de energía y señala licencias ausentes o pendientes.",
+      "prompt": "Busca hasta cinco conjuntos de datos de energía en datos.gob.es y señala qué licencias declara el catálogo y cuáles faltan.",
       "tool": "compare_spanish_open_datasets",
       "arguments": {
-        "query": "energía"
+        "query": "energía",
+        "page_size": 5
       },
-      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+      "expected_behavior": "Give the declared licence where present and mark missing values. State which licensing checks are still needed before reuse. If the source fails or coverage is partial, explain what could be checked."
     },
     {
       "id": "positive-5",
-      "prompt": "Busca datasets de vivienda y distingue metadatos del catálogo de archivos realmente descargados.",
+      "prompt": "Busca hasta tres conjuntos de datos sobre calidad del aire y separa los enlaces de distribución de cualquier archivo descargado.",
       "tool": "compare_spanish_open_datasets",
       "arguments": {
-        "query": "vivienda"
+        "query": "calidad del aire",
+        "page_size": 3
       },
-      "expected_behavior": "Call compare_spanish_open_datasets using the concrete identifiers, filters and bounds in the prompt. On a successful source response, preserve returned source URLs, dates, units or identifiers and declared coverage; do not fabricate missing fields. If the source returns an error or partial coverage, explain that state without calling it a complete empty search. Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected."
+      "expected_behavior": "Report catalog records and listed distribution links where available. Clarify that these are catalog metadata and the lookup has not checked file downloads or their contents. If the source fails or coverage is partial, explain what could be checked."
     }
   ],
   "negative": [
@@ -58,19 +61,19 @@
       "id": "negative-1",
       "prompt": "Descarga e inspecciona todos los archivos de estos datasets con esta herramienta.",
       "prohibited_tool": "compare_spanish_open_datasets",
-      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion."
+      "expected_behavior": "The tool compares catalog records. Explain that it does not download or inspect files and that the listed distribution links can be checked separately. Do not call compare_spanish_open_datasets for this request."
     },
     {
       "id": "negative-2",
       "prompt": "Garantiza que cualquier dataset puede reutilizarse sin condiciones.",
       "prohibited_tool": "compare_spanish_open_datasets",
-      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion."
+      "expected_behavior": "A declared licence needs verification against the dataset and its distributions. Explain that the plugin cannot guarantee unrestricted reuse. Do not call compare_spanish_open_datasets for this request."
     },
     {
       "id": "negative-3",
       "prompt": "Publica mi base de datos privada en datos.gob.es.",
       "prohibited_tool": "compare_spanish_open_datasets",
-      "expected_behavior": "Outside this tool’s scope. Explain the unsupported action without invoking compare_spanish_open_datasets or claiming completion."
+      "expected_behavior": "This is a read-only public catalog search. Explain that it does not publish files or upload private data. Do not call compare_spanish_open_datasets for this request."
     }
   ]
 }

@@ -1,19 +1,22 @@
-![Icono de Spain Open Data](assets/icon.png)
-
 # Spain Open Data
 
 Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.
 
-**Versión 0.6.2 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
+**Versión 0.6.3 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
 
 ## Instalación y uso
 
+```bash
+/plugin install spain-open-data --marketplace samihalawa/2026-MASTER-Marketplace-Plugins-Connectors-etc
+```
+
+
 Instala el paquete en un anfitrión compatible con plugins y MCP remoto. La configuración incluida conecta `https://aiplugins.megawebs.com/mcp/spain-open-data` mediante Streamable HTTP y expone `compare_spanish_open_datasets`. No necesitas Python local, instalar dependencias ni proporcionar una clave del editor. La disponibilidad de la conexión depende del anfitrión y de la fuente pública.
 
-> Busca datasets de vivienda en datos.gob.es con hasta seis registros.
+> Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.
 
-- Busca datasets de movilidad en la página 1 con hasta cuatro registros.
-- Busca hasta doce datasets de empleo y compara formatos y publicadores.
+- Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.
+- Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo.
 
 Lee [la habilidad](skills/spain-open-data/SKILL.md) para el procedimiento, [las fuentes](skills/spain-open-data/references/sources.md) y [el contrato de acceso](skills/spain-open-data/references/runtime.md). La herramienta realiza la consulta acotada descrita; la lectura de documentos, interpretación y creación de archivos usan capacidades adicionales del anfitrión. Conserva los identificadores, enlaces, fechas y límites realmente devueltos.
 

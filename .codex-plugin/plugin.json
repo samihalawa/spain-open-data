@@ -9,14 +9,15 @@
     "category": "Productivity",
     "composerIcon": "./assets/icon.png",
     "defaultPrompt": [
-      "Find Spanish employment datasets with reusable formats and clear licences.",
-      "Check whether this public dataset is suitable for my analysis."
+      "Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.",
+      "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
+      "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo."
     ],
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/logo.png",
-    "longDescription": "Search datos.gob.es catalog metadata by term and page; compare publishers, formats, licences and gaps without claiming distributions were inspected.\n\nConnects to a hosted, read-only MCP tool for official Spanish public-source queries. Complementary instructions guide source checks, document reading and interpretation using the host’s authorized capabilities. Results retain available provenance, dates, warnings and partial coverage. No local Python installation or publisher API key is required.\n\nThe tool does not submit applications, sign documents, make purchases, access protected records or start background monitoring. A historical example remains labelled as such. Source availability and complete coverage must be verified for each query; no official endorsement or legal, financial, title or eligibility guarantee is implied.",
-    "shortDescription": "Find reusable Spanish datasets",
+    "longDescription": "Search Spain’s datos.gob.es catalog by topic. Compare listed publishers, formats, distributions and declared licences for the returned datasets. Use the source links and metadata gaps to decide what to verify before downloading or reusing a dataset.",
+    "shortDescription": "Find Spanish open datasets",
     "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
     "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
     "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
@@ -34,7 +35,7 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "extensions": {
     "com.openai": {
