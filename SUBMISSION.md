@@ -1,4 +1,4 @@
-# Revisión — Spain Open Data 0.6.3
+# Revisión — Spain Open Data 0.6.4
 
 Paquete remoto con una herramienta: `compare_spanish_open_datasets` en `https://aiplugins.megawebs.com/mcp/spain-open-data`. Casos: cinco positivos y tres negativos en `plugin.json`. Las variantes cubren entradas o límites distintos; las fuentes dinámicas pueden devolver errores o cobertura parcial, que deben declararse sin fabricar resultados.
 

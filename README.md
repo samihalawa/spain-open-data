@@ -1,8 +1,8 @@
 # Spain Open Data
 
-Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.
+Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.
 
-**Versión 0.6.3 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
+**Versión 0.6.4 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
 
 ## Instalación y uso
 

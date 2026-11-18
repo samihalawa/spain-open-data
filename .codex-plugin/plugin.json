@@ -3,21 +3,21 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
+  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
   "interface": {
     "capabilities": [],
-    "category": "Productivity",
+    "category": "Data & Analytics",
     "composerIcon": "./assets/icon.png",
     "defaultPrompt": [
-      "Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.",
-      "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
-      "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo."
+      "Find Spanish housing datasets and compare publishers, formats and declared licences.",
+      "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
+      "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
     ],
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/logo.png",
-    "longDescription": "Search Spain’s datos.gob.es catalog by topic. Compare listed publishers, formats, distributions and declared licences for the returned datasets. Use the source links and metadata gaps to decide what to verify before downloading or reusing a dataset.",
-    "shortDescription": "Find Spanish open datasets",
+    "longDescription": "Find public datasets from Spain in the official datos.gob.es catalog. Search by topic and compare the listed publisher, file formats, distribution links and declared licence for each result. Follow pagination to review more datasets and use official catalog links to check missing metadata. Useful for research, data projects and finding sources on housing, transport, employment and other topics. The connector compares catalog metadata; it does not download or inspect data files, and catalog entries alone do not confirm freshness, access or permission to reuse a distribution.",
+    "shortDescription": "Find datasets and data sources",
     "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
     "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
     "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
@@ -25,17 +25,19 @@
   },
   "keywords": [
     "spain",
-    "claude-plugin",
-    "datos-abiertos",
-    "datos-gob-es",
+    "open data",
     "datasets",
-    "open-data",
-    "data-discovery"
+    "data sources",
+    "datos abiertos",
+    "datos.gob.es",
+    "CSV",
+    "API",
+    "licencias"
   ],
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "extensions": {
     "com.openai": {

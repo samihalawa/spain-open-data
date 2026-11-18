@@ -2,20 +2,24 @@
   "name": "Spain Open Data",
   "promise": "Encuentra el dataset. Comprueba si te sirve.",
   "audience": "Desarrolladores y equipos que buscan datos públicos reutilizables.",
-  "description": "Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones.",
-  "short": "Datasets listos para evaluar",
+  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
+  "short": "Datasets y datos abiertos",
   "source": "datos.gob.es",
   "keywords": [
-    "datos-abiertos",
-    "datos-gob-es",
+    "spain",
+    "open data",
     "datasets",
-    "open-data",
-    "data-discovery"
+    "data sources",
+    "datos abiertos",
+    "datos.gob.es",
+    "CSV",
+    "API",
+    "licencias"
   ],
   "prompts": [
-    "Busca datasets de empleo y compáralos por formato, licencia y fecha.",
-    "Encuentra datos de mi municipio y distingue catálogo, descarga e inspección real.",
-    "Muéstrame un ejemplo y qué comprobar antes de reutilizar los datos."
+    "Find Spanish housing datasets and compare publishers, formats and declared licences.",
+    "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
+    "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
   ],
   "benefits": [
     "Identificadores y enlaces oficiales para continuar la investigación.",
@@ -24,7 +28,7 @@
   ],
   "limits": "No garantiza que una descarga o licencia siga vigente. La fecha del catálogo no equivale al periodo del dato. No ejecuta archivos, macros o código, ni acredita reutilización a partir de metadatos incompletos.",
   "slug": "spain-open-data",
-  "version": "0.6.2",
+  "version": "0.6.4",
   "guidance": "Consulta pública con conector MCP alojado e instrucciones complementarias; conserva fuentes, fechas y cobertura real.",
   "mode": "hosted-read-only-mcp-with-guidance"
 }

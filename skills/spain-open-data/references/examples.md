@@ -1,4 +1,4 @@
-# Ejemplo histórico y escenarios de revisión
+# Ejemplos históricos y escenarios — Spain Open Data
 
 El archivo references/demo.json conserva una captura de 20 de octubre de 2026 de fichas de datos.gob.es. Lee captured_at y result como ejemplo histórico de metadatos: no acredita descargas actuales, inspección de ficheros ni permisos de reutilización vigentes.
 

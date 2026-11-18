@@ -1,5 +1,10 @@
 # Historial de versiones
 
+## 0.6.4
+
+- Aclara las tareas de búsqueda y comparación de datasets con ejemplos en español e inglés.
+- Alinea ficha, manifiestos e instrucciones de selección; conserva herramientas y cobertura.
+
 ## 0.6.3
 
 - Precisa los ejemplos de búsqueda y los resultados esperados para la revisión.

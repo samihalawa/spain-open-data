@@ -4,23 +4,23 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Consulta metadatos de datos.gob.es por t\u00e9rmino y p\u00e1gina; compara publicador, formatos, licencia y lagunas sin afirmar inspecci\u00f3n de las distribuciones.",
+  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
   "extensions": {
     "com.openai": {
       "interface": {
         "capabilities": [],
-        "category": "Productivity",
+        "category": "Data & Analytics",
         "composerIcon": "./assets/icon.png",
         "defaultPrompt": [
-          "Busca hasta seis conjuntos de datos de vivienda en la primera p\u00e1gina de datos.gob.es y cita sus fichas.",
-          "Busca movilidad en la p\u00e1gina de \u00edndice 1 de datos.gob.es, con un m\u00e1ximo de cuatro registros.",
-          "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el cat\u00e1logo."
+          "Find Spanish housing datasets and compare publishers, formats and declared licences.",
+          "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
+          "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
         ],
         "developerName": "Sami Halawa",
         "displayName": "Spain Open Data",
         "logo": "./assets/logo.png",
-        "longDescription": "Search Spain\u2019s datos.gob.es catalog by topic. Compare listed publishers, formats, distributions and declared licences for the returned datasets. Use the source links and metadata gaps to decide what to verify before downloading or reusing a dataset.",
-        "shortDescription": "Find Spanish open datasets",
+        "longDescription": "Find public datasets from Spain in the official datos.gob.es catalog. Search by topic and compare the listed publisher, file formats, distribution links and declared licence for each result. Follow pagination to review more datasets and use official catalog links to check missing metadata. Useful for research, data projects and finding sources on housing, transport, employment and other topics. The connector compares catalog metadata; it does not download or inspect data files, and catalog entries alone do not confirm freshness, access or permission to reuse a distribution.",
+        "shortDescription": "Find datasets and data sources",
         "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
         "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
         "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
@@ -28,9 +28,9 @@
       },
       "review": {
         "prompts": [
-          "Busca hasta seis conjuntos de datos de vivienda en la primera p\u00e1gina de datos.gob.es y cita sus fichas.",
-          "Busca movilidad en la p\u00e1gina de \u00edndice 1 de datos.gob.es, con un m\u00e1ximo de cuatro registros.",
-          "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el cat\u00e1logo."
+          "Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.",
+          "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
+          "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo."
         ],
         "commerce": false,
         "commerce_description": "Read-only official-source queries and assistant guidance; no checkout, payment or purchase functionality.",
@@ -38,31 +38,31 @@
           "positive": [
             {
               "description": "Find housing datasets by topic",
-              "prompt": "Busca hasta seis conjuntos de datos de vivienda en la primera p\u00e1gina de datos.gob.es y cita sus fichas.",
+              "prompt": "Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Return at most six catalog records with title, listed publisher and catalog link when available, and identify the checked page. If the source fails or coverage is partial, explain what could be checked."
             },
             {
               "description": "Request the second results page",
-              "prompt": "Busca movilidad en la p\u00e1gina de \u00edndice 1 de datos.gob.es, con un m\u00e1ximo de cuatro registros.",
+              "prompt": "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Use page index 1 and return at most four records. State the page index and report any returned continuation. If the source fails or coverage is partial, explain what could be checked."
             },
             {
               "description": "Compare listed formats and publishers",
-              "prompt": "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el cat\u00e1logo.",
+              "prompt": "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Compare the declared publishers and formats for up to twelve records. Identify unknown fields and retain the catalog links. If the source fails or coverage is partial, explain what could be checked."
             },
             {
               "description": "Identify licence verification gaps",
-              "prompt": "Busca hasta cinco conjuntos de datos de energ\u00eda en datos.gob.es y se\u00f1ala qu\u00e9 licencias declara el cat\u00e1logo y cu\u00e1les faltan.",
+              "prompt": "Busca hasta cinco conjuntos de datos de energía en datos.gob.es y señala qué licencias declara el catálogo y cuáles faltan.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Give the declared licence where present and mark missing values. State which licensing checks are still needed before reuse. If the source fails or coverage is partial, explain what could be checked."
             },
             {
               "description": "Distinguish catalog links from inspected files",
-              "prompt": "Busca hasta tres conjuntos de datos sobre calidad del aire y separa los enlaces de distribuci\u00f3n de cualquier archivo descargado.",
+              "prompt": "Busca hasta tres conjuntos de datos sobre calidad del aire y separa los enlaces de distribución de cualquier archivo descargado.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Report catalog records and listed distribution links where available. Clarify that these are catalog metadata and the lookup has not checked file downloads or their contents. If the source fails or coverage is partial, explain what could be checked."
             }
@@ -85,11 +85,11 @@
         "demo_recording_url": "https://github.com/samihalawa/spain-assistant-mcp-apps/releases/download/v0.6.1/spain-hosted-demo.mp4"
       },
       "publication": {
-        "release_notes": "Adds review cases for catalog pagination, formats, declared licences and metadata gaps.",
+        "release_notes": "Clearer task-based name, descriptions and examples for finding the right Spanish public records. Existing tools and source coverage are unchanged.",
         "translations": {
           "es-ES": {
-            "subtitle": "Datasets listos para evaluar",
-            "description": "Busca conjuntos de datos por tema en datos.gob.es. Compara publicadores, formatos, distribuciones y licencias declaradas. Usa los enlaces de origen y las lagunas de los metadatos para decidir qu\u00e9 verificar antes de descargar o reutilizar un conjunto."
+            "subtitle": "Datasets y datos abiertos",
+            "description": "Encuentra datasets públicos de España en el catálogo oficial datos.gob.es. Busca por tema y compara publicador, formatos, enlaces de distribución y licencia declarada. Continúa por páginas para revisar más resultados y consulta los enlaces oficiales cuando falten metadatos. Útil para investigación y proyectos de datos sobre vivienda, transporte, empleo y otros temas. El conector compara metadatos del catálogo: no descarga ni inspecciona archivos, y una ficha no confirma por sí sola actualidad, acceso o permiso de reutilización."
           }
         }
       }
@@ -97,16 +97,18 @@
   },
   "keywords": [
     "spain",
-    "claude-plugin",
-    "datos-abiertos",
-    "datos-gob-es",
+    "open data",
     "datasets",
-    "open-data",
-    "data-discovery"
+    "data sources",
+    "datos abiertos",
+    "datos.gob.es",
+    "CSV",
+    "API",
+    "licencias"
   ],
   "license": "MIT",
   "name": "spain-open-data",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "repository": "https://github.com/samihalawa/spain-open-data"
 }
