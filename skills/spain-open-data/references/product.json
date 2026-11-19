@@ -1,12 +1,14 @@
 {
   "name": "Spain Open Data",
-  "promise": "Encuentra el dataset. Comprueba si te sirve.",
+  "promise": "Encuentra datos de España para tu próximo análisis.",
   "audience": "Desarrolladores y equipos que buscan datos públicos reutilizables.",
-  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
-  "short": "Datasets y datos abiertos",
+  "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
+  "short": "Datos abiertos de España",
   "source": "datos.gob.es",
   "keywords": [
     "spain",
+    "España",
+    "Spanish",
     "open data",
     "datasets",
     "data sources",
@@ -17,18 +19,18 @@
     "licencias"
   ],
   "prompts": [
-    "Find Spanish housing datasets and compare publishers, formats and declared licences.",
-    "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
-    "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
+    "Busca datos abiertos de vivienda en España y compara publicador, formato y licencia declarada.",
+    "Find Spanish transport datasets and link the official catalog entries.",
+    "Necesito datos de empleo para un análisis: encuentra fuentes en datos.gob.es y señala qué información falta."
   ],
   "benefits": [
-    "Identificadores y enlaces oficiales para continuar la investigación.",
-    "Comparación de publicador, cobertura, formatos, licencia y fechas.",
-    "Metadatos encontrados separados de archivos realmente inspeccionados."
+    "Fuentes del catálogo nacional por el tema que necesitas investigar.",
+    "Comparación de publicador, formatos y licencia declarada.",
+    "Enlaces de distribución y lagunas separadas de archivos realmente inspeccionados."
   ],
   "limits": "No garantiza que una descarga o licencia siga vigente. La fecha del catálogo no equivale al periodo del dato. No ejecuta archivos, macros o código, ni acredita reutilización a partir de metadatos incompletos.",
   "slug": "spain-open-data",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "guidance": "Consulta pública con conector MCP alojado e instrucciones complementarias; conserva fuentes, fechas y cobertura real.",
   "mode": "hosted-read-only-mcp-with-guidance"
 }

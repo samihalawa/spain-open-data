@@ -1,5 +1,5 @@
 {
-  "version": "0.6.4",
+  "version": "0.6.5",
   "endpoint": "https://aiplugins.megawebs.com/mcp/spain-open-data",
   "scope": "Specification of positive inputs and expected behavior, and unsupported negative requests. This JSON defines cases and is not an execution log. Direct MCP calls and the SDK demo verify tool behavior; the demo does not test assistant routing. Actual native assistant test evidence is retained in the native release records.",
   "positive": [
@@ -54,6 +54,17 @@
         "page_size": 3
       },
       "expected_behavior": "Report catalog records and listed distribution links where available. Clarify that these are catalog metadata and the lookup has not checked file downloads or their contents. If the source fails or coverage is partial, explain what could be checked."
+    },
+    {
+      "id": "positive-indirect",
+      "prompt": "Estoy preparando un análisis de movilidad en España y necesito encontrar fuentes de datos, formatos y enlaces de distribución.",
+      "tool": "compare_spanish_open_datasets",
+      "arguments": {
+        "query": "movilidad",
+        "page": 0,
+        "page_size": 6
+      },
+      "expected_behavior": "Use the domain tool for the supplied public inputs without asking for unrelated account or profile information. Answer the requested comparison with returned official links, dates, units and actual coverage. Distinguish partial or failed source access from no matches; do not claim an unsupported feature or current status."
     }
   ],
   "negative": [

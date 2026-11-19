@@ -5,15 +5,15 @@
     "email": "sami@samihalawa.com"
   },
   "metadata": {
-    "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
-    "version": "0.6.4"
+    "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
+    "version": "0.6.5"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
-      "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
-      "version": "0.6.4"
+      "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
+      "version": "0.6.5"
     }
   ]
 }

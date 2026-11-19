@@ -4,7 +4,7 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
+  "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
   "extensions": {
     "com.openai": {
       "interface": {
@@ -12,15 +12,15 @@
         "category": "Data & Analytics",
         "composerIcon": "./assets/icon.png",
         "defaultPrompt": [
-          "Find Spanish housing datasets and compare publishers, formats and declared licences.",
-          "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
-          "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
+          "Busca datos abiertos de vivienda en España y compara publicador, formato y licencia declarada.",
+          "Find Spanish transport datasets and link the official catalog entries.",
+          "Necesito datos de empleo para un análisis: encuentra fuentes en datos.gob.es y señala qué información falta."
         ],
         "developerName": "Sami Halawa",
         "displayName": "Spain Open Data",
         "logo": "./assets/logo.png",
-        "longDescription": "Find public datasets from Spain in the official datos.gob.es catalog. Search by topic and compare the listed publisher, file formats, distribution links and declared licence for each result. Follow pagination to review more datasets and use official catalog links to check missing metadata. Useful for research, data projects and finding sources on housing, transport, employment and other topics. The connector compares catalog metadata; it does not download or inspect data files, and catalog entries alone do not confirm freshness, access or permission to reuse a distribution.",
-        "shortDescription": "Find datasets and data sources",
+        "longDescription": "Find datasets for research and data projects in Spain (España). Search the official datos.gob.es catalog by topic, including housing, transport, employment and other public-data needs. Compare publishers, file formats, distribution links and declared licences, with catalog links and missing metadata kept visible. Continue through further pages when useful. The connector returns catalog metadata; it does not download or inspect data files, and a listing alone does not establish freshness, access or reuse rights.",
+        "shortDescription": "Open datasets for Spain",
         "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
         "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
         "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
@@ -65,6 +65,12 @@
               "prompt": "Busca hasta tres conjuntos de datos sobre calidad del aire y separa los enlaces de distribución de cualquier archivo descargado.",
               "tools_triggered": "compare_spanish_open_datasets",
               "expected_behavior": "Report catalog records and listed distribution links where available. Clarify that these are catalog metadata and the lookup has not checked file downloads or their contents. If the source fails or coverage is partial, explain what could be checked."
+            },
+            {
+              "description": "Recognize the user task without naming the plugin",
+              "prompt": "Estoy preparando un análisis de movilidad en España y necesito encontrar fuentes de datos, formatos y enlaces de distribución.",
+              "tools_triggered": "compare_spanish_open_datasets",
+              "expected_behavior": "Use the domain tool for the supplied public inputs without asking for unrelated account or profile information. Answer the requested comparison with returned official links, dates, units and actual coverage. Distinguish partial or failed source access from no matches; do not claim an unsupported feature or current status."
             }
           ],
           "negative": [
@@ -85,10 +91,10 @@
         "demo_recording_url": "https://github.com/samihalawa/spain-assistant-mcp-apps/releases/download/v0.6.1/spain-hosted-demo.mp4"
       },
       "publication": {
-        "release_notes": "Clearer task-based name, descriptions and examples for finding the right Spanish public records. Existing tools and source coverage are unchanged.",
+        "release_notes": "Improved Spanish and English discovery, first-use prompts and sourced result guidance across Spain utilities. No new data access, payment features or background monitoring.",
         "translations": {
           "es-ES": {
-            "subtitle": "Datasets y datos abiertos",
+            "subtitle": "Datos abiertos de España",
             "description": "Encuentra datasets públicos de España en el catálogo oficial datos.gob.es. Busca por tema y compara publicador, formatos, enlaces de distribución y licencia declarada. Continúa por páginas para revisar más resultados y consulta los enlaces oficiales cuando falten metadatos. Útil para investigación y proyectos de datos sobre vivienda, transporte, empleo y otros temas. El conector compara metadatos del catálogo: no descarga ni inspecciona archivos, y una ficha no confirma por sí sola actualidad, acceso o permiso de reutilización."
           }
         }
@@ -97,6 +103,8 @@
   },
   "keywords": [
     "spain",
+    "España",
+    "Spanish",
     "open data",
     "datasets",
     "data sources",
@@ -108,7 +116,7 @@
   ],
   "license": "MIT",
   "name": "spain-open-data",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "repository": "https://github.com/samihalawa/spain-open-data"
 }

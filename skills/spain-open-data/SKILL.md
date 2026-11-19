@@ -1,15 +1,20 @@
 ---
 name: spain-open-data
-description: "Use when the user wants to find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links."
+description: "Use when the user wants to find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects."
 ---
 
 # Spain Open Data
 
-Encuentra el dataset. Comprueba si te sirve. Encuentra datasets españoles y compara publicador, formatos, licencia y fecha antes de integrarlos en tu trabajo.
+Encuentra datos de España para tu próximo análisis. Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.
+## Primera consulta y resultado útil
+
+Busca el tema que ya haya indicado el usuario, sin exigir de entrada formato o licencia preferidos. Compara los metadatos obtenidos y deja claro qué distribuciones aún no se han abierto. Continúa por las páginas devueltas cuando la petición pida más cobertura. Usa la herramienta MCP para su consulta soportada; si su respuesta ya resuelve la petición, no repitas esa búsqueda en el navegador. Abre documentos adicionales solo cuando la pregunta o una laguna material lo requieran. Reutiliza el contexto; pregunta solo por un dato esencial que no puedas resolver con la información o fuentes disponibles.
+
+Entrega primero la respuesta o comparación que pidió el usuario, con una tabla breve cuando ayude. Conserva enlaces oficiales, fechas, identificadores y unidades relevantes; explica los límites que cambien la interpretación junto al dato afectado. El resultado debe poder reutilizarse desde la conversación, sin publicidad, llamadas a contratar ni recomendaciones ajenas a la tarea. Propón una continuación solo cuando ayude a resolver la petición; no actives alertas, seguimiento ni funciones que no se hayan ejecutado.
 
 ## Cómo trabajar
 
-Esta edición 0.6.4 incluye el conector MCP alojado `compare_spanish_open_datasets` en `https://aiplugins.megawebs.com/mcp/spain-open-data`. Úsalo para su consulta pública de solo lectura: Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones. Aplica después las instrucciones para interpretar resultados y revisar documentos con las capacidades autorizadas del anfitrión. No requiere procesos locales, Python ni claves del editor. Envía solo argumentos públicos mínimos, nunca conversaciones completas, documentos privados ni credenciales.
+Esta edición 0.6.5 incluye el conector MCP alojado `compare_spanish_open_datasets` en `https://aiplugins.megawebs.com/mcp/spain-open-data`. Úsalo para su consulta pública de solo lectura: Consulta metadatos de datos.gob.es por término y página; compara publicador, formatos, licencia y lagunas sin afirmar inspección de las distribuciones. Aplica después las instrucciones para interpretar resultados y revisar documentos con las capacidades autorizadas del anfitrión. No requiere procesos locales, Python ni claves del editor. Envía solo argumentos públicos mínimos, nunca conversaciones completas, documentos privados ni credenciales.
 
 Busca en datos.gob.es y contrasta los candidatos con su publicador original. Separa los metadatos del catálogo de una distribución realmente abierta e inspeccionada.
 

@@ -1,8 +1,8 @@
 {
   "name": "spain-open-data",
   "displayName": "Spain Open Data",
-  "version": "0.6.4",
-  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
+  "version": "0.6.5",
+  "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
   "author": {
     "name": "Sami Halawa",
     "email": "sami@samihalawa.com"
@@ -10,6 +10,8 @@
   "license": "MIT",
   "keywords": [
     "spain",
+    "España",
+    "Spanish",
     "open data",
     "datasets",
     "data sources",

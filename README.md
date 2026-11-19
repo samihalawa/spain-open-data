@@ -1,22 +1,21 @@
 # Spain Open Data
 
-Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.
+Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.
 
-**Versión 0.6.4 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
+**Versión 0.6.5 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
 
 ## Instalación y uso
 
-```bash
-/plugin install spain-open-data --marketplace samihalawa/2026-MASTER-Marketplace-Plugins-Connectors-etc
-```
+Instalación y conexión: [abrir la página del producto](https://aiplugins.megawebs.com/plugins/spain-open-data). Elige allí las instrucciones del anfitrión que utilices.
 
 
 Instala el paquete en un anfitrión compatible con plugins y MCP remoto. La configuración incluida conecta `https://aiplugins.megawebs.com/mcp/spain-open-data` mediante Streamable HTTP y expone `compare_spanish_open_datasets`. No necesitas Python local, instalar dependencias ni proporcionar una clave del editor. La disponibilidad de la conexión depende del anfitrión y de la fuente pública.
 
-> Busca hasta seis conjuntos de datos de vivienda en la primera página de datos.gob.es y cita sus fichas.
+> Busca datos abiertos de vivienda en España y compara publicador, formato y licencia declarada.
 
-- Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.
-- Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo.
+- Find Spanish transport datasets and link the official catalog entries.
+- Necesito datos de empleo para un análisis: encuentra fuentes en datos.gob.es y señala qué información falta.
+
 
 Lee [la habilidad](skills/spain-open-data/SKILL.md) para el procedimiento, [las fuentes](skills/spain-open-data/references/sources.md) y [el contrato de acceso](skills/spain-open-data/references/runtime.md). La herramienta realiza la consulta acotada descrita; la lectura de documentos, interpretación y creación de archivos usan capacidades adicionales del anfitrión. Conserva los identificadores, enlaces, fechas y límites realmente devueltos.
 

@@ -3,21 +3,21 @@
     "email": "sami@samihalawa.com",
     "name": "Sami Halawa"
   },
-  "description": "Find Spanish open datasets (datos abiertos) in datos.gob.es by topic. Compare publishers, formats, distributions and declared licences with official catalog links.",
+  "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
   "interface": {
     "capabilities": [],
     "category": "Data & Analytics",
     "composerIcon": "./assets/icon.png",
     "defaultPrompt": [
-      "Find Spanish housing datasets and compare publishers, formats and declared licences.",
-      "Busca datos abiertos de transporte y enlaza las fichas de datos.gob.es.",
-      "Encuentra datasets de empleo y muestra qué metadatos faltan antes de descargarlos."
+      "Busca datos abiertos de vivienda en España y compara publicador, formato y licencia declarada.",
+      "Find Spanish transport datasets and link the official catalog entries.",
+      "Necesito datos de empleo para un análisis: encuentra fuentes en datos.gob.es y señala qué información falta."
     ],
     "developerName": "Sami Halawa",
     "displayName": "Spain Open Data",
     "logo": "./assets/logo.png",
-    "longDescription": "Find public datasets from Spain in the official datos.gob.es catalog. Search by topic and compare the listed publisher, file formats, distribution links and declared licence for each result. Follow pagination to review more datasets and use official catalog links to check missing metadata. Useful for research, data projects and finding sources on housing, transport, employment and other topics. The connector compares catalog metadata; it does not download or inspect data files, and catalog entries alone do not confirm freshness, access or permission to reuse a distribution.",
-    "shortDescription": "Find datasets and data sources",
+    "longDescription": "Find datasets for research and data projects in Spain (España). Search the official datos.gob.es catalog by topic, including housing, transport, employment and other public-data needs. Compare publishers, file formats, distribution links and declared licences, with catalog links and missing metadata kept visible. Continue through further pages when useful. The connector returns catalog metadata; it does not download or inspect data files, and a listing alone does not establish freshness, access or reuse rights.",
+    "shortDescription": "Open datasets for Spain",
     "websiteURL": "https://aiplugins.megawebs.com/plugins/spain-open-data",
     "supportURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/support",
     "privacyPolicyURL": "https://aiplugins.megawebs.com/plugins/spain-open-data/privacy",
@@ -25,6 +25,8 @@
   },
   "keywords": [
     "spain",
+    "España",
+    "Spanish",
     "open data",
     "datasets",
     "data sources",
@@ -37,7 +39,7 @@
   "license": "MIT",
   "name": "spain-open-data",
   "skills": "./skills",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "extensions": {
     "com.openai": {
