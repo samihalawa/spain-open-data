@@ -1,5 +1,11 @@
 # Historial de versiones
 
+## 0.6.6
+
+- Ajusta la ficha de revisión a cinco casos positivos y tres negativos, conservando un caso de intención indirecta.
+- Mantiene las mejoras de descubrimiento e inicio de 0.6.5 sin cambiar herramientas, datos o endpoints.
+
+
 ## 0.6.5
 
 - Mejora el descubrimiento en español e inglés, incluidos España y las tareas habituales del dominio.

@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
-    "version": "0.6.5"
+    "version": "0.6.6"
   },
   "plugins": [
     {
       "name": "spain-open-data",
       "source": "./",
       "description": "Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.",
-      "version": "0.6.5"
+      "version": "0.6.6"
     }
   ]
 }

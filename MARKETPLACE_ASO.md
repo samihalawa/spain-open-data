@@ -2,7 +2,7 @@
 
 Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.
 
-Versión 0.6.5: `compare_spanish_open_datasets` mediante MCP remoto alojado, complementado por instrucciones para revisar fuentes y documentos. No requiere Python local ni claves del editor. La cobertura y la vigencia se verifican por consulta; las capturas incluidas son históricas. Los textos de ficha y sus traducciones canónicos están en `plugin.json`. No implica afiliación oficial ni aprobación en un directorio.
+Versión 0.6.6: `compare_spanish_open_datasets` mediante MCP remoto alojado, complementado por instrucciones para revisar fuentes y documentos. No requiere Python local ni claves del editor. La cobertura y la vigencia se verifican por consulta; las capturas incluidas son históricas. Los textos de ficha y sus traducciones canónicos están en `plugin.json`. No implica afiliación oficial ni aprobación en un directorio.
 
 ## Descubrimiento y primera tarea
 

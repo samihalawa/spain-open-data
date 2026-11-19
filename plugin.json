@@ -43,12 +43,6 @@
               "expected_behavior": "Return at most six catalog records with title, listed publisher and catalog link when available, and identify the checked page. If the source fails or coverage is partial, explain what could be checked."
             },
             {
-              "description": "Request the second results page",
-              "prompt": "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
-              "tools_triggered": "compare_spanish_open_datasets",
-              "expected_behavior": "Use page index 1 and return at most four records. State the page index and report any returned continuation. If the source fails or coverage is partial, explain what could be checked."
-            },
-            {
               "description": "Compare listed formats and publishers",
               "prompt": "Busca hasta doce conjuntos de datos de empleo y compara los publicadores y formatos que declara el catálogo.",
               "tools_triggered": "compare_spanish_open_datasets",
@@ -116,7 +110,7 @@
   ],
   "license": "MIT",
   "name": "spain-open-data",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "homepage": "https://aiplugins.megawebs.com/plugins/spain-open-data",
   "repository": "https://github.com/samihalawa/spain-open-data"
 }

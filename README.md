@@ -2,7 +2,7 @@
 
 Find open datasets from Spain (datos abiertos de España) in datos.gob.es. Compare publishers, formats, distribution links and declared licences for research and data projects.
 
-**Versión 0.6.5 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
+**Versión 0.6.6 · Conector MCP alojado e instrucciones complementarias · Sami Halawa · MIT**
 
 ## Instalación y uso
 

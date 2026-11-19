@@ -1,4 +1,4 @@
-# Desarrollo — Spain Open Data 0.6.5
+# Desarrollo — Spain Open Data 0.6.6
 
 El paquete configura un MCP remoto Streamable HTTP; no contiene un servidor Python local. Contrato: `compare_spanish_open_datasets` en `https://aiplugins.megawebs.com/mcp/spain-open-data`. El servidor compartido se mantiene en `connectors/spain-assistant-mcp-apps` del repositorio privado maestro.
 

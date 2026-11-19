@@ -1,5 +1,5 @@
 {
-  "version": "0.6.5",
+  "version": "0.6.6",
   "endpoint": "https://aiplugins.megawebs.com/mcp/spain-open-data",
   "scope": "Specification of positive inputs and expected behavior, and unsupported negative requests. This JSON defines cases and is not an execution log. Direct MCP calls and the SDK demo verify tool behavior; the demo does not test assistant routing. Actual native assistant test evidence is retained in the native release records.",
   "positive": [
@@ -13,17 +13,6 @@
         "page_size": 6
       },
       "expected_behavior": "Return at most six catalog records with title, listed publisher and catalog link when available, and identify the checked page. If the source fails or coverage is partial, explain what could be checked."
-    },
-    {
-      "id": "positive-2",
-      "prompt": "Busca movilidad en la página de índice 1 de datos.gob.es, con un máximo de cuatro registros.",
-      "tool": "compare_spanish_open_datasets",
-      "arguments": {
-        "query": "movilidad",
-        "page": 1,
-        "page_size": 4
-      },
-      "expected_behavior": "Use page index 1 and return at most four records. State the page index and report any returned continuation. If the source fails or coverage is partial, explain what could be checked."
     },
     {
       "id": "positive-3",

@@ -1,6 +1,6 @@
 # Spain Open Data — ejemplo histórico
 
-Muestra histórica conservada de una edición anterior, incluida como referencia en Spain Open Data 0.6.5. Leerla no ejecuta ni actualiza la consulta original.
+Muestra histórica conservada de una edición anterior, incluida como referencia en Spain Open Data 0.6.6. Leerla no ejecuta ni actualiza la consulta original.
 
 Encuentra el dataset. Comprueba si te sirve.
 
